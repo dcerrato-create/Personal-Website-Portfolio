@@ -375,18 +375,3 @@ Final result: **0 errors, 0 warnings, 0 notices.**
 
 ---
 
-## What I learned
-
-- Being specific up front produced far better results than asking for
-  something vague. The homepage only worked once I described the exact
-  interaction I wanted rather than asking for "an animation."
-- It is worth rejecting output you do not like. My best section is the one
-  I sent back and made it rebuild from scratch.
-- AI is genuinely useful as a reviewer, not just a writer. It caught a
-  private company's funding figure heading onto a public page, personal
-  browser tabs visible in a screenshot I was about to publish, a wrong digit
-  in my own phone number, and a flaw in my reasoning about which GitHub link
-  was which.
-- Understanding what the code does matters more than writing it. I asked it
-  to remove a technical claim from my project card because I could not
-  explain it, and that was the right call.
