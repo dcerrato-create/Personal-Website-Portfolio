@@ -306,7 +306,7 @@ sections with a table of contents. It also explained two things it chose
 
 ---
 
-## Phase 9 — Deploying
+## Phase 8 — Deploying
 
 **Me:** ok, we are ready for step 4: deploy and test
 
