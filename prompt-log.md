@@ -306,26 +306,6 @@ sections with a table of contents. It also explained two things it chose
 
 ---
 
-## Phase 8 — Documenting AI usage
-
-**Me:** AI usage: Add comments throughout the code ... for each section and
-interactive features, like the links to my resume, wharton certificate, and
-link to ocntact section ... For the links, the comment should follow this
-idea: I provided Ai with x document or y contact information, sent it, and
-then reviewed all changes and manually accpeted every single change made by
-claude code. For the section, the comment should follow the general idea
-that we worked on this section by section ... For inetractive features,
-especially the flag one ... I expalined the general interaction idea,
-explicitly sent yoyu anything rrequired ... then we tried it multiple times
-until the interaction that I wanted was achived.
-
-**Claude:** Added a workflow note at the top of the file and fourteen
-comments through it — one per section, one per interactive feature, and one
-per link — describing exactly what I supplied and how each part was built
-and approved.
-
----
-
 ## Phase 9 — Deploying
 
 **Me:** ok, we are ready for step 4: deploy and test
