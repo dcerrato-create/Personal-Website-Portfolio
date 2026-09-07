@@ -17,17 +17,6 @@ per the assignment note that the log does not need to include AI-produced files.
 The log is in chronological order and grouped by what I was working on at
 the time, that way it is easier for TA's to review it. 
 
-**My workflow, which stayed the same throughout:**
-
-1. I described what I wanted in my own words before any code was written.
-2. I worked one section at a time and reviewed each before moving on.
-3. I spent extra time on the interactive features and rejected versions
-   that were not what I pictured.
-4. I supplied all of my own content — every link, document, photo and
-   piece of contact information.
-5. I reviewed and manually approved every single change. Several were
-   rejected outright and redone.
-
 ---
 
 ## Phase 0 — Setup and orientation
