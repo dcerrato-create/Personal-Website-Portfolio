@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<!--
+  David Cerrato — Personal Portfolio Website
+  CMU 15-113: Effective Coding with AI — Project 1
+
+  ============================================================
+  AI USAGE — HOW THIS SITE WAS BUILT
+  ============================================================
+
+  I built this site using Claude Code as an assistant. My workflow
+  was consistent throughout, and it worked like this:
+
+  1. I decided what I wanted first, in my own words. Before any code
+     was written I described the idea — the structure of a section,
+     how an interaction should feel, what the page should say — and
+     only then asked Claude to build it.
+
+  2. I worked section by section rather than generating the whole
+     site at once. Home, then About, then Experience, then Projects,
+     then Contact. Each section was finished and reviewed before I
+     moved to the next one, so I always knew what had just changed.
+
+  3. I spent extra time on the interactive features. The homepage
+     flag sequence in particular went through several versions — I
+     rejected the first one outright and kept redirecting until the
+     interaction behaved the way I had pictured it.
+
+  4. I supplied all of my own content. Every link, document and piece
+     of contact information on this page — my resume, my Wharton
+     certificate, my LinkedIn, my GitHub, my email and phone — was
+     sent by me for Claude to wire in. None of it was invented.
+
+  5. I reviewed and manually approved every single change. Claude
+     never edited this file on its own; each edit was shown to me
+     first and I accepted, corrected or rejected it. Several were
+     rejected and redone, and I corrected factual errors myself.
+
+  The comments through the rest of the file note where AI was used on
+  each specific part. The full conversation is in prompt-log.md.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="David Cerrato — Finance and Statistics &amp; Data Science student at Carnegie Mellon's Tepper School of Business, from Tegucigalpa, Honduras.">
+<title>David Cerrato — Portfolio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   STYLESHEET CONTENTS
+
+    1. Design tokens        colours, spacing, easing
+    2. Navigation           fixed glass bar
+    3. Hero                 scroll-driven flag sequence
+    4. Content sections     shared shell, headings, footer
+    5. Reveal-on-scroll     shared fade-up utility
+    6. About                portrait, bio, fact grid, skills
+    7. Experience           timeline
+    8. Projects             card grid
+    9. Contact              details and links
+   10. Responsive           breakpoints at 820px and 560px
+   11. Accessibility        reduced-motion fallback
+   ============================================================ */
+
+/* ============================================================
+   1. DESIGN TOKENS
+   One place to change the whole look. Palette is black / grey /
+   dark navy, with the Honduran flag blue as the single accent.
+   ============================================================ */
+:root{
+  --ink:        #05070a;   /* page background, near-black        */
+  --ink-2:      #090d14;   /* slightly lifted panel background   */
+  --line:       rgba(255,255,255,.09);
+  --text:       #e8edf4;
+  --muted:      #7d8a9c;
+  --muted-dim:  #586373;
+  --accent:     #2f9be8;   /* Honduran blue, tuned for dark bg   */
+  --accent-soft:#7cc6f5;
+
+  --nav-h: 68px;
+  --shell: 1120px;
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+
+  /* System monospace — costs nothing to load and gives the skill
+     pills a technical feel that sets them apart from body copy. */
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:var(--ink);
+  color:var(--text);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Film grain — kills the flat "default webpage" feel.
+   Inline SVG noise, so there is no external image to load. */
+body::after{
+  content:'';
+  position:fixed; inset:0;
+  pointer-events:none; z-index:9999;
+  opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   2. NAVIGATION — glass bar, always stuck to the top
+   ============================================================ */
+nav{
+  position:fixed; top:0; left:0; right:0;
+  height:var(--nav-h);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 clamp(20px, 5vw, 48px);
+  z-index:1000;
+  background:rgba(5,7,10,.55);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border-bottom:1px solid transparent;
+  transition:background .35s var(--ease), border-color .35s var(--ease);
+}
+nav.is-scrolled{
+  background:rgba(5,7,10,.82);
+  border-bottom-color:var(--line);
+}
+
+.brand{
+  font-size:.9rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--text);
+  text-decoration:none; white-space:nowrap;
+}
+.brand span{ color:var(--accent); }
+
+.nav-links{
+  display:flex; gap:clamp(14px, 2.4vw, 34px);
+  align-items:center;
+}
+.nav-links a{
+  position:relative;
+  font-size:.82rem; font-weight:500; letter-spacing:.06em;
+  color:var(--muted); text-decoration:none;
+  padding:6px 0;
+  transition:color .25s var(--ease);
+  white-space:nowrap;
+}
+.nav-links a:hover{ color:var(--text); }
+
+/* Underline that grows from the left on hover / when active */
+.nav-links a::after{
+  content:''; position:absolute; left:0; bottom:0;
+  height:1px; width:100%;
+  background:var(--accent);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .35s var(--ease);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after{ transform:scaleX(1); }
+.nav-links a.active{ color:var(--text); }
+
+/* ============================================================
+   3. HERO — the scroll-driven sequence
+   #home is deliberately TALL. Inside it, .stage is sticky and
+   fills the screen, so the flag stays pinned in place while the
+   page scrolls "through" it. JS turns that scroll distance into
+   a 0 -> 1 progress value and hands it to the CSS variables
+   below. Nothing moves on a timer; the visitor drives it.
+   ============================================================ */
+#home{
+  height:280vh;              /* scroll runway for the sequence */
+  position:relative;
+}
+
+.stage{
+  position:sticky; top:0;
+  height:100vh;
+  display:grid; place-items:center;
+  overflow:hidden;
+
+  /* Values written by JS each frame */
+  --flag-o:1; --flag-s:1; --flag-f:none;
+  --l0:0; --l1:0; --l2:0;
+  --hint:1;
+}
+
+/* Ambient glow behind the flag */
+.stage::before{
+  content:''; position:absolute;
+  width:min(1100px, 130vw); aspect-ratio:1;
+  background:radial-gradient(circle,
+    rgba(47,155,232,.16) 0%,
+    rgba(47,155,232,.06) 38%,
+    transparent 68%);
+  opacity:calc(.45 + var(--flag-o) * .55);
+  pointer-events:none;
+}
+
+.stage-inner{
+  position:relative;
+  width:100%;
+  display:grid; place-items:center;
+  grid-template-areas:"layer";   /* flag + statement share one cell */
+}
+.stage-inner > *{ grid-area:layer; }
+
+/* ---------- The flag ---------- */
+.flag-wrap{
+  opacity:var(--flag-o);
+  /* translateZ(0) promotes this to its own compositor layer, so the
+     browser can re-blend it each frame without repainting the page. */
+  transform:scale(var(--flag-s)) translateZ(0);
+  /* Set as a whole value rather than blur(var(--x)) so JS can switch it
+     to `none` when the flag is at rest — a filter layer costs GPU time
+     even at blur(0), and that was a big part of the stutter. */
+  filter:var(--flag-f, none);
+  will-change:opacity, transform, filter;
+}
+
+/* Separate element for the one-time entrance, so the load-in
+   animation and the scroll-driven fade never fight each other.
+   Nested opacity multiplies, which is exactly what we want. */
+.flag-inner{
+  animation:flagIn 1.1s var(--ease) both;
+}
+@keyframes flagIn{
+  from{ opacity:0; transform:translateY(26px) scale(.97); }
+  to  { opacity:1; transform:none; }
+}
+
+.flag{
+  width:min(74vw, 760px);
+  aspect-ratio:2 / 1;
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 40px 90px -30px rgba(0,0,0,.9),
+    0 0 70px -20px rgba(47,155,232,.30);
+}
+.flag svg{ display:block; width:100%; height:100%; }
+
+.flag-caption{
+  margin-top:26px;
+  text-align:center;
+  font-size:.74rem; font-weight:500;
+  letter-spacing:.28em; text-transform:uppercase;
+  color:var(--muted-dim);
+}
+
+/* ---------- The statement ---------- */
+.statement{
+  max-width:min(92vw, 940px);
+  text-align:center;
+  pointer-events:none;
+}
+/* Every line animates identically; only its progress source differs.
+   The shared rule reads --p, and each nth-child below simply points
+   --p at that line's own variable. Defining the motion once means the
+   three lines can never drift out of sync. */
+.statement .line{
+  display:block;
+  font-size:clamp(1.5rem, 4.4vw, 3.25rem);
+  font-weight:600;
+  line-height:1.22;
+  letter-spacing:-.022em;
+  color:var(--text);
+  will-change:opacity, transform;
+
+  opacity:var(--p, 0);
+  transform:translateY(calc((1 - var(--p, 0)) * 26px))
+            scale(calc(.982 + var(--p, 0) * .018))
+            translateZ(0);
+}
+.statement .line:nth-child(1){ --p:var(--l0); }
+.statement .line:nth-child(2){ --p:var(--l1); }
+.statement .line:nth-child(3){
+  --p:var(--l2);
+  margin-top:.42em;
+  color:var(--accent);
+  font-weight:700;
+}
+.statement em{
+  font-style:normal;
+  color:var(--accent-soft);
+  font-weight:700;
+}
+
+/* ---------- Scroll hint ---------- */
+.scroll-hint{
+  position:absolute; bottom:38px; left:50%;
+  transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  opacity:var(--hint);
+  transition:opacity .2s linear;
+  pointer-events:none;
+}
+.scroll-label{
+  font-size:.66rem; letter-spacing:.34em; text-transform:uppercase;
+  color:var(--muted-dim);
+}
+.scroll-line{
+  display:block; width:1px; height:52px;
+  background:linear-gradient(to bottom, var(--accent), transparent);
+  transform-origin:top;
+  animation:hintPulse 2.1s ease-in-out infinite;
+}
+@keyframes hintPulse{
+  0%,100%{ transform:scaleY(.35); opacity:.4; }
+  50%    { transform:scaleY(1);   opacity:1;  }
+}
+
+/* ============================================================
+   4. CONTENT SECTIONS — shared shell, heading and eyebrow styles
+   ============================================================ */
+.section{
+  min-height:88vh;
+  padding:clamp(80px, 12vh, 140px) clamp(20px, 5vw, 48px);
+  scroll-margin-top:var(--nav-h);
+  border-top:1px solid var(--line);
+  background:var(--ink);
+  display:flex; align-items:center;
+}
+.shell{ width:100%; max-width:var(--shell); margin:0 auto; }
+
+.eyebrow{
+  display:flex; align-items:center; gap:14px;
+  font-size:.7rem; font-weight:600;
+  letter-spacing:.3em; text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:22px;
+}
+.eyebrow::after{
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right, var(--line), transparent);
+}
+
+.section h2{
+  font-size:clamp(2rem, 5.5vw, 3.6rem);
+  font-weight:700; letter-spacing:-.03em;
+  line-height:1.05;
+  margin-bottom:20px;
+}
+.section p{
+  font-size:clamp(1rem, 1.5vw, 1.12rem);
+  line-height:1.75;
+  color:var(--muted);
+  max-width:62ch;
+}
+
+footer{
+  padding:34px clamp(20px,5vw,48px);
+  border-top:1px solid var(--line);
+  font-size:.78rem; color:var(--muted-dim);
+  display:flex; flex-wrap:wrap; gap:10px;
+  justify-content:space-between;
+}
+
+/* Source credit. flex-basis:100% forces it onto its own line
+   beneath the two items above. */
+footer .credit{
+  flex-basis:100%;
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  font-size:.72rem;
+  line-height:1.65;
+  opacity:.75;
+}
+footer .credit a{
+  color:inherit;
+  text-decoration:underline;
+  text-decoration-color:rgba(255,255,255,.2);
+  text-underline-offset:2px;
+  transition:color .25s var(--ease);
+}
+footer .credit a:hover{ color:var(--accent-soft); }
+
+/* ============================================================
+   5. REVEAL-ON-SCROLL (shared by every content section)
+   Elements start slightly low and transparent, then settle when
+   they enter the viewport. --d staggers siblings.
+   ============================================================ */
+.reveal{
+  opacity:0;
+  transform:translateY(24px);
+  transition:opacity .75s var(--ease), transform .75s var(--ease);
+  transition-delay:var(--d, 0s);
+}
+.reveal.in{ opacity:1; transform:none; }
+
+/* ============================================================
+   6. ABOUT SECTION
+   ============================================================ */
+.about-top{
+  display:grid;
+  grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+  gap:clamp(28px, 5vw, 66px);
+  align-items:start;
+  margin-bottom:clamp(44px, 6vw, 72px);
+}
+
+/* ---- Portrait ---- */
+.portrait{
+  position:relative;
+  aspect-ratio:4 / 5;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(155deg, rgba(47,155,232,.12), transparent 58%),
+    var(--ink-2);
+  display:grid;
+  place-items:center;
+  box-shadow:0 30px 70px -40px rgba(0,0,0,.9);
+  margin:0;
+}
+
+/* The source photo is landscape (3:2) and the frame is portrait
+   (4:5), so object-fit crops the sides. object-position pulls the
+   crop upward off dead-centre so the face sits in the top third
+   with headroom, rather than being centred like a passport photo. */
+.portrait img{
+  width:100%; height:100%;
+  object-fit:cover;
+  object-position:50% 28%;
+  display:block;
+  transition:transform 1.1s var(--ease);
+}
+.portrait:hover img{ transform:scale(1.035); }
+
+/* Gradient scrim at the bottom edge so a bright photo settles into
+   the dark page instead of floating on top of it. */
+.portrait::after{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(5,7,10,.5), transparent 42%);
+  pointer-events:none;
+}
+
+/* ---- Bio ---- */
+.bio .lead{
+  font-size:clamp(1.14rem, 2vw, 1.42rem);
+  line-height:1.55;
+  letter-spacing:-.012em;
+  font-weight:500;
+  color:var(--text);
+  margin-bottom:1.15em;
+  max-width:none;
+}
+.bio p + p{ margin-top:1.05em; }
+.bio p{ max-width:60ch; }
+
+/* ---- Fact grid ----
+   gap:1px over a light background paints hairline dividers
+   between cells, which reads cleaner than bordering each card. */
+.facts{
+  display:grid;
+  /* Column count is a variable so a variant (and the breakpoints
+     below) can change it by setting one number, instead of
+     re-declaring grid-template-columns and fighting specificity. */
+  grid-template-columns:repeat(var(--facts-cols, 4), minmax(0,1fr));
+  gap:1px;
+  background:var(--line);
+  border:1px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+}
+.fact{
+  background:var(--ink-2);
+  padding:clamp(18px, 2.3vw, 27px);
+  min-height:118px;
+  display:flex; flex-direction:column; justify-content:center; gap:9px;
+  transition:background .3s var(--ease);
+}
+.fact:hover{ background:#0e141d; }
+.fact.wide{ grid-column:span 2; }
+
+.fact dt{
+  font-size:.64rem; font-weight:600;
+  letter-spacing:.24em; text-transform:uppercase;
+  color:var(--accent);
+}
+.fact dd{
+  font-size:clamp(1rem, 1.5vw, 1.2rem);
+  font-weight:600;
+  letter-spacing:-.015em;
+  color:var(--text);
+  line-height:1.35;
+}
+
+/* Secondary line inside a fact card — carries the detail without
+   competing with the headline value above it. */
+.fact-sub{
+  display:block;
+  margin-top:6px;
+  font-size:.78rem; font-weight:400;
+  letter-spacing:0;
+  line-height:1.45;
+  color:var(--muted);
+}
+
+/* ---- Resume button ---- */
+.btn{
+  display:inline-flex; align-items:center; gap:11px;
+  margin-top:30px;
+  padding:13px 24px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--ink-2);
+  color:var(--text);
+  text-decoration:none;
+  font-size:.74rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase;
+  transition:border-color .3s var(--ease), background .3s var(--ease),
+             color .3s var(--ease), transform .3s var(--ease);
+}
+.btn:hover{
+  border-color:rgba(47,155,232,.55);
+  background:rgba(47,155,232,.09);
+  color:var(--accent-soft);
+  transform:translateY(-2px);
+}
+.btn svg{ width:15px; height:15px; flex:none; }
+/* Arrow slides down a touch on hover to hint "download" */
+.btn svg .arr{ transition:transform .3s var(--ease); }
+.btn:hover svg .arr{ transform:translateY(2px); }
+
+/* ---- Key coursework & skills ---- */
+.skills{ margin-top:clamp(40px, 5.5vw, 64px); }
+
+.sub-label{
+  font-size:.68rem; font-weight:600;
+  letter-spacing:.26em; text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+.pills{
+  list-style:none;
+  display:flex; flex-wrap:wrap;
+  gap:10px;
+}
+.pills li{
+  font-family:var(--mono);
+  font-size:.78rem;
+  letter-spacing:.01em;
+  color:var(--muted);
+  padding:9px 17px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--ink-2);
+  white-space:nowrap;
+  transition:color .28s var(--ease), border-color .28s var(--ease),
+             background .28s var(--ease), transform .28s var(--ease);
+}
+.pills li:hover{
+  color:var(--text);
+  border-color:rgba(47,155,232,.5);
+  background:rgba(47,155,232,.08);
+  transform:translateY(-2px);
+}
+
+/* Featured pill — lit from within so it reads as the headline
+   credential rather than one item in a list. It is also the only
+   pill that is a link, so the anchor carries the padding: that makes
+   the whole pill a click target rather than just the text. */
+.pills li.feature{
+  padding:0;
+  position:relative;
+  color:#eaf6ff;
+  font-weight:600;
+  border-color:rgba(47,155,232,.7);
+  background:linear-gradient(135deg,
+    rgba(47,155,232,.26), rgba(47,155,232,.06));
+  box-shadow:0 8px 28px -10px rgba(47,155,232,.75);
+}
+.pills li.feature:hover{
+  border-color:var(--accent);
+  background:linear-gradient(135deg,
+    rgba(47,155,232,.36), rgba(47,155,232,.12));
+  box-shadow:0 10px 32px -8px rgba(47,155,232,.9);
+}
+
+.pills li.feature a{
+  display:flex; align-items:center;
+  padding:9px 17px;
+  border-radius:inherit;
+  color:inherit;
+  text-decoration:none;
+  cursor:pointer;
+}
+.pills li.feature a::before{
+  content:'\25C6';        /* ◆ */
+  margin-right:9px;
+  color:var(--accent);
+  font-size:.66rem;
+}
+/* ↗ signals this one leaves the site — the other pills are inert */
+.pills li.feature a::after{
+  content:'\2197';
+  display:inline-block;
+  margin-left:9px;
+  font-size:.82rem;
+  opacity:.7;
+  transition:transform .28s var(--ease), opacity .28s var(--ease);
+}
+.pills li.feature a:hover::after{
+  transform:translate(2px, -2px);
+  opacity:1;
+}
+.pills li.feature a:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+}
+
+/* ---- Hover tooltip ----
+   Shared by the featured pill and the "reach out" link. Any element
+   marked .tip-host positions one; the tooltip is the main signal
+   that a thing is clickable when its neighbours are not. */
+.tip-host{ position:relative; }
+
+.tip{
+  position:absolute;
+  bottom:calc(100% + 13px);
+  left:50%;
+  transform:translateX(-50%) translateY(5px);
+  z-index:5;
+
+  white-space:nowrap;
+  /* Stated explicitly so the tooltip looks identical whether its
+     host is a mono pill or a paragraph set in Inter. */
+  font-family:var(--mono);
+  font-size:.63rem; font-weight:600;
+  letter-spacing:.16em; text-transform:uppercase;
+  color:var(--text);
+
+  background:#0d141d;
+  border:1px solid rgba(47,155,232,.42);
+  border-radius:9px;
+  padding:9px 14px;
+  box-shadow:0 14px 34px -14px rgba(0,0,0,.95);
+
+  opacity:0;
+  pointer-events:none;   /* never blocks the click underneath */
+  transition:opacity .25s var(--ease), transform .25s var(--ease);
+}
+
+/* Caret: a rotated square with two matching borders, so the outline
+   continues cleanly around the point. */
+.tip::after{
+  content:'';
+  position:absolute;
+  top:calc(100% - 5px); left:50%;
+  width:9px; height:9px;
+  transform:translateX(-50%) rotate(45deg);
+  background:#0d141d;
+  border-right:1px solid rgba(47,155,232,.42);
+  border-bottom:1px solid rgba(47,155,232,.42);
+}
+
+/* Shown on hover, and on keyboard focus so it is not mouse-only */
+.tip-host:hover .tip,
+.tip-host a:focus-visible ~ .tip{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* Touch devices have no hover state, and a nowrap tooltip can
+   overflow a narrow screen — so hide it there entirely. */
+@media (hover:none){
+  .tip{ display:none; }
+}
+
+/* ---- "Feel free to reach out!" inline link ---- */
+.reach-wrap{ display:inline-block; }
+.reach{
+  color:var(--accent-soft);
+  text-decoration:underline;
+  text-decoration-color:rgba(124,198,245,.45);
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+  cursor:pointer;
+  transition:color .25s var(--ease), text-decoration-color .25s var(--ease);
+}
+.reach:hover{
+  color:var(--accent);
+  text-decoration-color:var(--accent);
+}
+.reach:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:3px;
+}
+
+/* ============================================================
+   7. EXPERIENCE SECTION
+   A hairline-divided timeline. Left column carries the when and
+   where, right column the role and what you actually did.
+   ============================================================ */
+.timeline{
+  list-style:none;
+  border-top:1px solid var(--line);
+  margin-top:clamp(28px, 4vw, 44px);
+}
+
+.exp{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,190px) minmax(0,1fr);
+  gap:clamp(16px, 4vw, 54px);
+  padding:clamp(26px, 3.4vw, 38px) clamp(14px, 1.8vw, 24px);
+  border-bottom:1px solid var(--line);
+  transition:background .3s var(--ease);
+}
+.exp:hover{ background:rgba(255,255,255,.016); }
+
+/* Accent bar wipes down the left edge on hover. Absolutely
+   positioned, so the text never shifts. */
+.exp::before{
+  content:'';
+  position:absolute; left:0; top:-1px; bottom:-1px;
+  width:2px; background:var(--accent);
+  transform:scaleY(0); transform-origin:top;
+  transition:transform .38s var(--ease);
+}
+.exp:hover::before{ transform:scaleY(1); }
+
+/* ---- Left column: when & where ---- */
+.exp-when{
+  display:flex; flex-direction:column;
+  align-items:flex-start; gap:7px;
+  padding-top:3px;
+}
+.exp-date{
+  font-family:var(--mono);
+  font-size:.78rem; letter-spacing:.01em;
+  color:var(--accent);
+}
+.exp-place{ font-size:.78rem; color:var(--muted-dim); }
+.exp-kind{
+  font-family:var(--mono);
+  font-size:.6rem; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted-dim);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:4px 10px;
+  margin-top:3px;
+}
+
+/* ---- Right column: role & detail ---- */
+.exp-role{
+  font-size:clamp(1.12rem, 2vw, 1.4rem);
+  font-weight:650; letter-spacing:-.02em;
+  line-height:1.3;
+  margin-bottom:5px;
+  transition:color .3s var(--ease);
+}
+.exp:hover .exp-role{ color:var(--accent-soft); }
+
+.exp-org{
+  font-size:.95rem; font-weight:500;
+  color:var(--muted);
+  margin-bottom:17px;
+}
+
+.exp-points{ list-style:none; display:flex; flex-direction:column; gap:9px; }
+.exp-points li{
+  position:relative;
+  padding-left:19px;
+  font-size:.94rem; line-height:1.65;
+  color:var(--muted);
+  max-width:68ch;
+}
+.exp-points li::before{
+  content:'';
+  position:absolute; left:1px; top:.63em;
+  width:5px; height:5px; border-radius:50%;
+  background:var(--muted-dim);
+  transition:background .3s var(--ease);
+}
+.exp:hover .exp-points li::before{ background:var(--accent); }
+
+/* ============================================================
+   8. PROJECTS SECTION
+   A uniform card grid. grid-auto-rows:1fr forces every row to the
+   same height, so the real project and the reserved slots come out
+   identical in size — the reserved ones are just emptier.
+   ============================================================ */
+.proj-grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  grid-auto-rows:1fr;
+  gap:clamp(16px, 2vw, 22px);
+  margin-top:clamp(28px, 4vw, 44px);
+}
+
+.proj-card{
+  display:flex; flex-direction:column;
+  padding:clamp(17px, 2vw, 22px);
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--ink-2);
+  transition:border-color .3s var(--ease), background .3s var(--ease);
+}
+.proj-card:hover{ border-color:rgba(47,155,232,.34); }
+
+/* Reserved slots: dashed, so they read as deliberately empty */
+.proj-card.is-empty{
+  border-style:dashed;
+  border-color:rgba(255,255,255,.13);
+  background:rgba(255,255,255,.012);
+}
+.proj-card.is-empty:hover{
+  border-color:rgba(47,155,232,.34);
+  background:rgba(47,155,232,.03);
+}
+
+/* ---- Screenshot frame ---- */
+.proj-thumb{
+  position:relative;
+  /* Matched exactly to the screenshot's own dimensions (4480x2276).
+     When the frame and the image share a ratio, object-fit:cover has
+     nothing to trim — so the nav and the name stay fully visible. */
+  aspect-ratio:4480 / 2276;
+  border-radius:11px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(150deg, rgba(47,155,232,.14), transparent 62%),
+    var(--ink);
+  display:grid; place-items:center;
+  margin-bottom:17px;
+}
+.is-empty .proj-thumb{
+  border-style:dashed;
+  border-color:rgba(255,255,255,.11);
+  background:rgba(255,255,255,.014);
+}
+.proj-thumb img{
+  width:100%; height:100%;
+  object-fit:cover; object-position:top center;
+  display:block;
+  transition:transform 1s var(--ease);
+}
+.proj-card:hover .proj-thumb img{ transform:scale(1.03); }
+
+/* ---- Card copy ---- */
+.proj-num{
+  font-family:var(--mono);
+  font-size:.66rem; letter-spacing:.14em;
+  color:var(--muted-dim);
+  margin-bottom:8px;
+}
+.proj-title{
+  font-size:clamp(1.02rem, 1.5vw, 1.16rem);
+  font-weight:650; letter-spacing:-.018em;
+  margin-bottom:9px;
+}
+.proj-desc{
+  font-size:.88rem; line-height:1.62;
+  color:var(--muted);
+  margin-bottom:15px;
+}
+.is-empty .proj-desc{ color:var(--muted-dim); }
+
+.pills.sm{ gap:7px; }
+.pills.sm li{ font-size:.68rem; padding:5px 12px; }
+
+/* margin-top:auto pins the footer row to the bottom of the card, so
+   all four cards line their controls up regardless of copy length. */
+.proj-links{
+  display:flex; flex-wrap:wrap; gap:10px;
+  margin-top:auto;
+  padding-top:18px;
+}
+.link{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 16px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:transparent;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.67rem; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase;
+  transition:color .28s var(--ease), border-color .28s var(--ease),
+             background .28s var(--ease), transform .28s var(--ease);
+}
+.link:hover{
+  color:var(--accent-soft);
+  border-color:rgba(47,155,232,.55);
+  background:rgba(47,155,232,.08);
+  transform:translateY(-2px);
+}
+.link:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+.link svg{ width:13px; height:13px; flex:none; }
+
+.proj-soon{
+  align-self:flex-start;
+  margin-top:auto;
+  font-family:var(--mono);
+  font-size:.58rem; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted-dim);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+}
+
+/* ============================================================
+   9. CONTACT SECTION
+   Deliberately spare: two literal values in the hairline grid,
+   then three word-links for things that stand in for a URL.
+   ============================================================ */
+.contact-facts{
+  --facts-cols:2;
+  max-width:780px;
+}
+/* Email is a real mailto: link but shows its literal value, so it
+   gets no underline — the underline is reserved for words standing
+   in for a destination. The phone number is plain text. */
+.fact dd a.plain{
+  color:inherit;
+  text-decoration:none;
+  transition:color .25s var(--ease);
+}
+.fact dd a.plain:hover{ color:var(--accent-soft); }
+.fact dd a.plain:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:3px;
+}
+
+.contact-links{
+  display:flex; flex-wrap:wrap;
+  gap:clamp(20px, 3.2vw, 40px);
+  margin-top:clamp(26px, 3.5vw, 38px);
+  font-size:clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight:600;
+  letter-spacing:-.015em;
+}
+
+/* ============================================================
+   10. RESPONSIVE
+   ============================================================ */
+@media (max-width:820px){
+  :root{ --nav-h:60px; }
+  .brand{ font-size:.78rem; letter-spacing:.1em; }
+  .nav-links{ gap:16px; }
+  .nav-links a{ font-size:.74rem; letter-spacing:.03em; }
+  #home{ height:240vh; }
+  .flag-caption{ letter-spacing:.2em; font-size:.66rem; }
+
+  /* About stacks: portrait on top, capped so it does not dominate */
+  .about-top{ grid-template-columns:1fr; }
+  .portrait{ max-width:360px; margin-inline:auto; width:100%; }
+  .facts{ --facts-cols:2; }
+
+  /* Experience stacks; when/where becomes a single wrapping row */
+  .exp{ grid-template-columns:1fr; gap:14px; }
+  .exp-when{
+    flex-direction:row; flex-wrap:wrap;
+    align-items:center; gap:10px;
+  }
+  .exp-kind{ margin-top:0; }
+}
+
+@media (max-width:560px){
+  .brand{ display:none; }          /* give the links the full bar */
+  .nav-links{ width:100%; justify-content:space-between; gap:8px; }
+  .nav-links a{ font-size:.7rem; }
+  .flag{ width:86vw; border-radius:7px; }
+  .statement .line{ font-size:clamp(1.25rem, 6.4vw, 1.9rem); }
+  .scroll-line{ height:38px; }
+
+  .facts{ --facts-cols:1; }           /* covers .contact-facts too */
+  .fact.wide{ grid-column:span 1; }   /* reset, or it would overflow */
+  .fact{ min-height:96px; }
+
+  /* Single column: let each card size to its own content, otherwise
+     every reserved slot inherits the tall card's height. */
+  .proj-grid{ grid-template-columns:1fr; grid-auto-rows:auto; }
+}
+
+/* ============================================================
+   11. ACCESSIBILITY — respect reduced-motion.
+   The whole sequence collapses to a single readable screen.
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  html{ scroll-behavior:auto; }
+  #home{ height:auto; }
+  .stage{ position:static; height:auto; padding:calc(var(--nav-h) + 60px) 20px 80px; }
+  .stage-inner{ grid-template-areas:none; gap:52px; }
+  .stage-inner > *{ grid-area:auto; }
+  .flag-wrap{ opacity:1 !important; transform:none !important; filter:none !important; }
+  .flag-inner{ animation:none; }
+  .statement .line{ opacity:1 !important; transform:none !important; }
+  .scroll-hint{ display:none; }
+  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================== NAV =====================
+     AI NOTE: I asked for a bar fixed to the top with links to each
+     section, so a visitor never has to scroll to navigate. Claude
+     built it and I approved the change after reviewing it. -->
+<nav id="nav">
+  <a href="#home" class="brand">David <span>Cerrato</span></a>
+  <div class="nav-links">
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- ===================== HERO =====================
+     AI NOTE — INTERACTIVE FEATURE.
+     This is the part I spent the most time on. I described the
+     interaction I wanted in my own words: the Honduran flag should
+     appear large and centred, hold completely still, and only begin
+     to dissolve into my statement when the visitor scrolls — never
+     on a timer. I wrote and supplied the statement myself ("There
+     are around 8,000 undergraduate CMU students, yet only one is
+     from Honduras, and that is me").
+
+     We went through several versions. I rejected the first attempt
+     entirely because it looked generic and used a timed fade, and I
+     kept sending it back until the motion felt right — including
+     fixing the star placement on the flag and smoothing out a
+     transition that felt rough. Every version was shown to me before
+     it was applied and I manually approved each one. -->
+<section id="home">
+  <div class="stage" id="stage">
+    <div class="stage-inner">
+
+      <!-- Flag: inline SVG so it stays razor sharp at any size.
+           Three equal bands (blue / white / blue) with the five
+           stars in the centre band, arranged in the quincunx. -->
+      <div class="flag-wrap">
+        <div class="flag-inner">
+          <div class="flag">
+            <svg viewBox="0 0 1200 600" role="img" aria-label="Flag of Honduras">
+              <defs>
+                <!-- One five-pointed star, drawn around the origin with an
+                     outer radius of 38 and an inner radius of 14.5, then
+                     reused five times. Small enough that all five stay
+                     inside the white band, which is how the real flag is. -->
+                <g id="star">
+                  <polygon points="0,-38 8.5,-11.8 36.1,-11.8 13.8,4.5 22.3,30.7 0,14.5
+                                   -22.3,30.7 -13.8,4.5 -36.1,-11.8 -8.5,-11.8"/>
+                </g>
+              </defs>
+
+              <rect width="1200" height="600"        fill="#f4f7fb"/>
+              <rect width="1200" height="200"        fill="#0f7fd4"/>
+              <rect width="1200" height="200" y="400" fill="#0f7fd4"/>
+
+              <!-- Quincunx: one star dead centre, four at the corners of a
+                   rectangle around it. The +4 on every y nudges the group
+                   down slightly, because a five-pointed star's visual centre
+                   sits a little below its geometric one. -->
+              <g fill="#0f7fd4">
+                <use href="#star" x="600" y="304"/>
+                <use href="#star" x="505" y="252"/>
+                <use href="#star" x="695" y="252"/>
+                <use href="#star" x="505" y="356"/>
+                <use href="#star" x="695" y="356"/>
+              </g>
+            </svg>
+          </div>
+          <p class="flag-caption">Tegucigalpa &nbsp;·&nbsp; Honduras</p>
+        </div>
+      </div>
+
+      <!-- Statement: revealed line by line as the flag dissolves -->
+      <p class="statement">
+        <span class="line">There are around <em>8,000</em> undergraduate</span>
+        <span class="line">CMU students, yet only <em>one</em> is from Honduras,</span>
+        <span class="line">and that is me.</span>
+      </p>
+
+    </div>
+
+    <div class="scroll-hint">
+      <span class="scroll-label">Scroll</span>
+      <span class="scroll-line" aria-hidden="true"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTENT SECTIONS ===================== -->
+<!-- ===================== ABOUT =====================
+     AI NOTE: I planned this section before it was built — I asked
+     for a large photo, a paragraph area, and a grid of facts, and I
+     listed the exact fields I wanted in order (university, major,
+     additional major, minor, hometown, based in, GPA). Claude built
+     the layout with placeholders first so I could see it, then I
+     sent my own bio text and photo to replace them. I reviewed and
+     manually approved every change. -->
+<section class="section" id="about">
+  <div class="shell">
+
+    <div class="eyebrow reveal">01 — About</div>
+    <h2 class="reveal" style="--d:.06s">About Me</h2>
+
+    <div class="about-top">
+
+      <figure class="portrait reveal" style="--d:.12s">
+        <img src="assets/david-cerrato.jpg" loading="lazy" decoding="async"
+             alt="David Cerrato, photographed at the Tepper School of Business">
+      </figure>
+
+      <div class="bio reveal" style="--d:.18s">
+        <p class="lead">
+          I am currently studying Finance and pursuing an additional major in
+          Statistics &amp; Data Science with a minor in Economics, combining
+          rigorous quantitative training with a deep passion for financial
+          markets.
+        </p>
+        <p>
+          My professional interests lie at the intersection of finance and
+          data, with a long-term aspiration to break into data science or
+          finance, specifically in private equity, where I hope to master the
+          art of investment, business valuation, and value creation.
+          Ultimately, my greatest ambition is to take everything I learn and
+          bring it back home — investing in Honduras and contributing to the
+          growth of my country.
+        </p>
+        <p>
+          Beyond finance and data science, I am an avid soccer player with
+          experience competing in international tournaments across Mexico and
+          Europe. I am a highly social and people-driven individual, always
+          looking to connect and build meaningful relationships.
+          <!-- AI NOTE — LINK. I asked for this sentence to be underlined
+               and to jump to my Contact section when clicked, with a
+               tooltip on hover. Claude implemented it and I manually
+               approved the change. -->
+          <span class="reach-wrap tip-host">
+            <a class="reach" href="#contact"
+               aria-describedby="reach-tip">Feel free to reach out!</a>
+            <span class="tip" id="reach-tip" role="tooltip">Click to connect</span>
+          </span>
+        </p>
+
+        <!-- AI NOTE — LINK. I gave Claude my resume PDF and asked for a
+             button that opens it. Claude added the file to the assets
+             folder and wired up this link; I reviewed the change and
+             manually approved it before it was applied. -->
+        <a class="btn" href="assets/David-Cerrato-Resume.pdf"
+           target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <g class="arr">
+              <path d="M7 10l5 5 5-5"/>
+              <path d="M12 15V3"/>
+            </g>
+          </svg>
+          View Resume
+        </a>
+      </div>
+
+    </div>
+
+    <dl class="facts reveal" style="--d:.24s">
+
+      <div class="fact wide">
+        <dt>University</dt>
+        <dd>Carnegie Mellon University
+          <span class="fact-sub">Tepper School of Business &middot; Class of 2029</span>
+        </dd>
+      </div>
+
+      <div class="fact">
+        <dt>Major</dt>
+        <dd>Business Administration
+          <span class="fact-sub">B.S. &middot; Finance Concentration</span>
+        </dd>
+      </div>
+
+      <div class="fact">
+        <dt>Additional Major</dt>
+        <dd>Statistics &amp; Data Science</dd>
+      </div>
+
+      <div class="fact">
+        <dt>Minor</dt>
+        <dd>Economics</dd>
+      </div>
+
+      <div class="fact">
+        <dt>Hometown</dt>
+        <dd>Tegucigalpa, Honduras</dd>
+      </div>
+
+      <div class="fact">
+        <dt>Based In</dt>
+        <dd>Pittsburgh, Pennsylvania</dd>
+      </div>
+
+      <div class="fact">
+        <dt>GPA</dt>
+        <dd>3.79 / 4.00
+          <span class="fact-sub">Dean's List &middot; Fall 2025 &amp; Spring 2026</span>
+        </dd>
+      </div>
+
+    </dl>
+
+    <!-- AI NOTE — LINK. I listed my coursework and skills myself and
+         asked for the Wharton certificate to stand out from the rest.
+         I sent Claude the credential URL from Wharton Online, and it
+         made that one pill a link with a tooltip so visitors know it
+         is clickable. I reviewed and approved each change. -->
+    <div class="skills reveal" style="--d:.3s">
+      <h3 class="sub-label">Key Coursework &amp; Skills</h3>
+      <ul class="pills">
+        <li class="feature tip-host">
+          <a href="https://certificates.wharton.wallstreetprep.com/750a41be-2f4c-4c6f-9da2-cb69d7732726#acc.TX4fSwvE"
+             target="_blank" rel="noopener"
+             aria-describedby="wharton-tip">Wharton Private Equity Certificate Program</a>
+          <span class="tip" id="wharton-tip" role="tooltip">Click to see credentials</span>
+        </li>
+        <li>Accounting</li>
+        <li>Microeconomics</li>
+        <li>Business Computing</li>
+        <li>Statistics + Probability</li>
+        <li>Multivariate Analysis</li>
+        <li>Finance</li>
+        <li>Effective Coding with AI</li>
+        <li>Public Speaking</li>
+        <li>Financial Reporting</li>
+        <li>LBO Modeling</li>
+        <li>Valuation</li>
+        <li>Spanish and English</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== EXPERIENCE =====================
+     AI NOTE: I sent my resume and told Claude which roles to include
+     and in what order. It drafted the timeline and shortened my
+     resume bullets for the web; I read every line, corrected the
+     wording where it was wrong, removed entries I did not want, and
+     manually approved each change before it was applied. -->
+<section class="section" id="experience">
+  <div class="shell">
+
+    <div class="eyebrow reveal">02 — Experience</div>
+    <h2 class="reveal" style="--d:.06s">Experience</h2>
+
+    <!-- Reverse-chronological. Copy condensed from the resume —
+         edit any bullet, or drop a whole <li class="exp"> block. -->
+    <ol class="timeline">
+
+      <li class="exp reveal">
+        <div class="exp-when">
+          <span class="exp-date">Jan 2026 — Present</span>
+          <span class="exp-place">Pittsburgh, PA</span>
+          <span class="exp-kind">Extracurricular</span>
+        </div>
+        <div class="exp-what">
+          <h3 class="exp-role">Mentee</h3>
+          <p class="exp-org">Research &amp; Asset Management Academy</p>
+          <ul class="exp-points">
+            <li>Selected from a pool of 30+ applicants through a technical and behavioral interview process.</li>
+            <li>Weekly curriculum across private equity, hedge funds, and credit research, paired with one-on-one mentorship.</li>
+            <li>Hands-on training in value investing, three-statement financial modeling, and LBO modeling.</li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="exp reveal">
+        <div class="exp-when">
+          <span class="exp-date">June — July 2026</span>
+          <span class="exp-place">Miami, FL</span>
+          <span class="exp-kind">Internship</span>
+        </div>
+        <div class="exp-what">
+          <h3 class="exp-role">Financial Analyst</h3>
+          <p class="exp-org">ImaageQ Corporation</p>
+          <ul class="exp-points">
+            <li>Analyzed financial models and investor relations strategy alongside ImaageQ's CFO for a seed round, covering valuation frameworks, term sheets, and pitch materials, and presented them to institutional and accredited investors with the executive team.</li>
+            <li>Developed competitive analysis and market positioning strategy for a spatial intelligence startup operating in the AR real estate commerce space.</li>
+            <li>Translated technical product architecture into institutional investment narratives, creating investor-facing documents and scenario planning (2026–2029) for potential stakeholders.</li>
+            <li>Supported go-to-market strategy and startup fundraising from pre-revenue stage through pilot validation, learning firsthand how founders build companies from the ground up.</li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="exp reveal">
+        <div class="exp-when">
+          <span class="exp-date">July 2025</span>
+          <span class="exp-place">San Lorenzo, Honduras</span>
+          <span class="exp-kind">Internship</span>
+        </div>
+        <div class="exp-what">
+          <h3 class="exp-role">Administration Intern</h3>
+          <p class="exp-org">Grupo Agrolíbano</p>
+          <ul class="exp-points">
+            <li>End-to-end operational internship at Honduras's second-largest melon exporter, spanning field-level operations through corporate administration.</li>
+            <li>Followed the full melon-cultivation cycle, building a working understanding of the supply chain and production workflow.</li>
+            <li>Supported the management team on organizational tasks and the coordination of daily business activity.</li>
+            <li>Sat in on B2B client and shipping meetings covering contract fulfillment, limited freight options, and long transit times.</li>
+          </ul>
+        </div>
+      </li>
+
+      <li class="exp reveal">
+        <div class="exp-when">
+          <span class="exp-date">July 2024</span>
+          <span class="exp-place">Miami, FL</span>
+          <span class="exp-kind">Internship</span>
+        </div>
+        <div class="exp-what">
+          <h3 class="exp-role">Wealth Management Intern</h3>
+          <p class="exp-org">Andbank</p>
+          <ul class="exp-points">
+            <li>Executed and processed client transactions while analyzing portfolios across asset classes.</li>
+            <li>Researched equities, fixed income, and mutual funds, including earnings analysis of portfolio companies.</li>
+            <li>Prepared and distributed daily market briefs to clients and internal teams.</li>
+            <li>Joined direct calls with fund managers, gaining exposure to asset management discussions.</li>
+          </ul>
+        </div>
+      </li>
+
+    </ol>
+
+  </div>
+</section>
+
+<!-- ===================== PROJECTS =====================
+     AI NOTE: I asked for this site itself to be the first project and
+     for the rest to be reserved slots for later in the semester, all
+     the same size. I took the screenshot myself and sent it over.
+     Claude built the card grid and I approved each change. -->
+<section class="section" id="projects">
+  <div class="shell">
+
+    <div class="eyebrow reveal">03 &mdash; Projects</div>
+    <h2 class="reveal" style="--d:.06s">Projects</h2>
+    <p class="reveal" style="--d:.1s">
+      This portfolio is the first entry. Each new project from 15-113 gets
+      added here as the semester progresses.
+    </p>
+
+    <div class="proj-grid">
+
+      <!-- 01 — this website -->
+      <article class="proj-card reveal">
+        <div class="proj-thumb">
+          <img src="assets/project-portfolio.jpg" loading="lazy" decoding="async"
+               alt="Screenshot of the portfolio homepage showing the Honduran flag">
+        </div>
+
+        <span class="proj-num">01</span>
+        <h3 class="proj-title">Personal Portfolio Website</h3>
+        <p class="proj-desc">
+          My first web project, built from scratch with no framework. The
+          homepage opens on the Honduran flag and dissolves it into a single
+          statement as you scroll &mdash; driven by scroll position rather than
+          a timer, so the visitor controls the pace.
+        </p>
+
+        <ul class="pills sm">
+          <li>HTML</li>
+          <li>CSS</li>
+          <li>JavaScript</li>
+          <li>Responsive</li>
+        </ul>
+
+        <!-- AI NOTE — LINKS. I supplied both URLs: my live GitHub Pages
+             address and my repository. Claude wired them into these
+             two buttons and I manually approved the change. -->
+        <div class="proj-links">
+          <a class="link" href="https://dcerrato-create.github.io/Personal-Website-Portfolio/"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <path d="M15 3h6v6"/><path d="M10 14L21 3"/>
+            </svg>
+            Live Site
+          </a>
+          <a class="link" href="https://github.com/dcerrato-create/Personal-Website-Portfolio"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/>
+            </svg>
+            GitHub Repository
+          </a>
+        </div>
+      </article>
+
+      <!-- 02 — reserved -->
+      <article class="proj-card is-empty reveal" style="--d:.06s">
+        <div class="proj-thumb"></div>
+
+        <span class="proj-num">02</span>
+        <h3 class="proj-title">Project Two</h3>
+        <p class="proj-desc">Reserved for later projects&hellip;</p>
+        <span class="proj-soon">Coming soon</span>
+      </article>
+
+      <!-- 03 — reserved -->
+      <article class="proj-card is-empty reveal" style="--d:.12s">
+        <div class="proj-thumb"></div>
+
+        <span class="proj-num">03</span>
+        <h3 class="proj-title">Project Three</h3>
+        <p class="proj-desc">Reserved for later projects&hellip;</p>
+        <span class="proj-soon">Coming soon</span>
+      </article>
+
+      <!-- 04 — reserved -->
+      <article class="proj-card is-empty reveal" style="--d:.18s">
+        <div class="proj-thumb"></div>
+
+        <span class="proj-num">04</span>
+        <h3 class="proj-title">Project Four</h3>
+        <p class="proj-desc">Reserved for later projects&hellip;</p>
+        <span class="proj-soon">Coming soon</span>
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== CONTACT =====================
+     AI NOTE — LINKS. Every detail in this section came from me. I sent
+     Claude my phone number, my Andrew email, my LinkedIn URL, my
+     GitHub profile URL and my resume file, and asked for the last
+     three to appear as underlined words rather than raw links. Claude
+     wired each one up; I checked every destination myself, corrected
+     my phone number when a digit was wrong, and manually approved
+     every change before it was applied. -->
+<section class="section" id="contact">
+  <div class="shell">
+
+    <div class="eyebrow reveal">04 &mdash; Contact</div>
+    <h2 class="reveal" style="--d:.06s">Contact</h2>
+
+    <dl class="facts contact-facts reveal" style="--d:.12s">
+      <div class="fact">
+        <dt>Phone</dt>
+        <!-- Deliberately plain text, not a tel: link. macOS hands tel:
+             off to FaceTime, which is not what a visitor clicking a
+             phone number expects. This is here to be read and copied. -->
+        <dd>412-475-1209</dd>
+      </div>
+      <div class="fact">
+        <dt>Email</dt>
+        <dd><a class="plain" href="mailto:dcerrato@andrew.cmu.edu">dcerrato@andrew.cmu.edu</a></dd>
+      </div>
+    </dl>
+
+    <div class="contact-links reveal" style="--d:.18s">
+      <a class="reach" href="https://www.linkedin.com/in/davidcerrato123"
+         target="_blank" rel="noopener">LinkedIn</a>
+      <a class="reach" href="https://github.com/dcerrato-create"
+         target="_blank" rel="noopener">GitHub</a>
+      <a class="reach" href="assets/David-Cerrato-Resume.pdf"
+         target="_blank" rel="noopener">Resume</a>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 David Cerrato</span>
+  <span>David Cerrato &mdash; Personal Portfolio Website</span>
+
+  <!-- Source credit. The only third-party asset on this site is the
+       typeface; all photographs are my own and the Honduran flag is
+       drawn in code rather than taken from an image file. -->
+  <span class="credit">
+    Typeface: <a href="https://fonts.google.com/specimen/Inter"
+                 target="_blank" rel="noopener">Inter</a>
+    by Rasmus Andersson, served via Google Fonts under the
+    SIL Open Font License. All photographs are my own.
+  </span>
+</footer>
+
+<script>
+/* ================================================================
+   HERO SCROLL ENGINE
+
+   The core idea: convert "how far you have scrolled through the
+   tall #home section" into a single number p, from 0 to 1, then
+   map slices of p onto each visual change.
+
+   p = 0     -> flag sitting still, fully visible
+   p ~ 0.42  -> flag has dissolved
+   p ~ 0.85  -> all three statement lines have landed
+   p = 1     -> statement holds until you scroll past the hero
+
+   AI NOTE — INTERACTIVE FEATURE.
+   I described the behaviour I wanted before any of this was written:
+   the flag must stay completely still until the visitor scrolls, and
+   the scroll itself must drive the dissolve. Claude wrote the first
+   version of this mapping. I then tested it and sent it back several
+   times — the flag needed to hold longer before it started to go,
+   and the numbers below are the ranges I settled on. Every revision
+   was shown to me and manually approved before it was applied.
+   ================================================================ */
+
+const stage     = document.getElementById('stage');
+const hero      = document.getElementById('home');
+const nav       = document.getElementById('nav');
+const navLinks  = [...document.querySelectorAll('.nav-links a')];
+const reduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* clamp a number into 0..1 */
+const clamp01 = n => n < 0 ? 0 : n > 1 ? 1 : n;
+
+/* Map v from range [a,b] onto 0..1, then ease it so movement
+   starts and stops softly instead of running at constant speed. */
+function ramp(v, a, b){
+  const t = clamp01((v - a) / (b - a));
+  return t * t * (3 - 2 * t);          // smoothstep
+}
+
+/* ---------------------------------------------------------------
+   Cached measurements. Reading offsetTop mid-animation forces the
+   browser to re-run layout, which is exactly the kind of hitch we
+   are trying to remove, so we measure once and again on resize.
+   --------------------------------------------------------------- */
+const sections = ['home','about','experience','projects','contact']
+  .map(id => document.getElementById(id));
+
+let tops = [];
+let runway = 1;
+
+function measure(){
+  tops   = sections.map(s => s.offsetTop);
+  runway = Math.max(1, hero.offsetHeight - window.innerHeight);
+}
+
+/* ---------------------------------------------------------------
+   SMOOTHING
+
+   targetP  = where the scrollbar actually is, right now
+   currentP = where the animation is, which CHASES targetP
+
+   A wheel or trackpad delivers scroll in coarse jumps, so binding
+   the visuals straight to targetP made the flag move in those same
+   jumps — that was the roughness. Instead we move currentP a
+   fraction of the remaining distance every frame. The result keeps
+   up with you but always arrives softly.
+
+   The fraction is derived from elapsed time rather than assumed to
+   be one 60Hz frame, so it decays at the same real-world rate on a
+   120Hz laptop as on a 60Hz monitor.
+
+   AI NOTE: this smoothing exists because I told Claude the animation
+   felt rough and asked it to be fixed. This was the second attempt at
+   the problem; I approved the change after testing it myself.
+   --------------------------------------------------------------- */
+const CHASE = 0.11;          // higher = snappier, lower = floatier
+
+let targetP  = 0;
+let currentP = 0;
+let rafId    = null;
+let lastT    = 0;
+
+function paint(p){
+  /* Flag: holds still until p = 0.08, fully gone by p = 0.44 */
+  const out = ramp(p, 0.08, 0.44);
+  stage.style.setProperty('--flag-o', (1 - out).toFixed(4));
+  stage.style.setProperty('--flag-s', (1 + out * 0.11).toFixed(4));
+  /* Drop the filter entirely once the flag is settled — an active
+     filter layer costs GPU time every frame even at blur(0). */
+  stage.style.setProperty('--flag-f',
+    out < 0.004 ? 'none' : `blur(${(out * 6).toFixed(2)}px)`);
+
+  /* Statement: three overlapping windows, so the lines arrive one
+     after another. The windows are wide and heavily overlapped so
+     no single line ever snaps into place. */
+  stage.style.setProperty('--l0', ramp(p, 0.26, 0.54).toFixed(4));
+  stage.style.setProperty('--l1', ramp(p, 0.36, 0.66).toFixed(4));
+  stage.style.setProperty('--l2', ramp(p, 0.48, 0.80).toFixed(4));
+
+  stage.style.setProperty('--hint', (1 - ramp(p, 0, 0.12)).toFixed(4));
+}
+
+function loop(t){
+  const dt = lastT ? Math.min(t - lastT, 64) : 16.7;
+  lastT = t;
+
+  const k = 1 - Math.pow(1 - CHASE, dt / 16.7);
+  currentP += (targetP - currentP) * k;
+
+  /* Snap and stop once the gap is invisible, so we are not burning
+     a frame forever on a difference of 0.0001. */
+  if (Math.abs(targetP - currentP) < 0.0004) currentP = targetP;
+
+  paint(currentP);
+
+  if (currentP !== targetP){
+    rafId = requestAnimationFrame(loop);
+  } else {
+    rafId = null;
+    lastT = 0;
+  }
+}
+
+function kick(){
+  if (rafId === null){
+    lastT = 0;
+    rafId = requestAnimationFrame(loop);
+  }
+}
+
+/* Highlight whichever section is currently under the nav bar. */
+function setActiveLink(){
+  const probe = window.scrollY + window.innerHeight * 0.35;
+  let current = 0;
+  for (let i = 0; i < tops.length; i++){
+    if (tops[i] <= probe) current = i;
+  }
+  navLinks.forEach(a =>
+    a.classList.toggle('active',
+      a.getAttribute('href') === '#' + sections[current].id)
+  );
+}
+
+function onScroll(){
+  targetP = clamp01(window.scrollY / runway);
+  nav.classList.toggle('is-scrolled', window.scrollY > 40);
+  setActiveLink();
+  if (!reduced) kick();
+}
+
+window.addEventListener('scroll', onScroll, { passive:true });
+window.addEventListener('resize', () => { measure(); onScroll(); });
+window.addEventListener('load',   () => { measure(); onScroll(); });
+
+measure();
+onScroll();
+if (!reduced) { currentP = targetP; paint(currentP); }
+
+/* Smooth scrolling for the nav links. CSS scroll-behavior already
+   handles this, but doing it here lets us keep the URL clean and
+   stay consistent across browsers.
+
+   AI NOTE — INTERACTIVE FEATURE. Smooth scrolling between sections
+   was one of the two interactions I asked for from the start. Claude
+   implemented it and I approved the change. */
+navLinks.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(link.getAttribute('href'));
+    if (!target) return;
+    window.scrollTo({
+      top: target === hero ? 0 : target.offsetTop - 1,
+      behavior: reduced ? 'auto' : 'smooth'
+    });
+  });
+});
+
+/* ================================================================
+   REVEAL ON SCROLL
+
+   Anything with class="reveal" starts low and transparent, then
+   settles the first time it enters the viewport. Siblings can be
+   staggered with an inline --d delay. We unobserve after firing so
+   elements never re-hide when you scroll back up.
+
+   AI NOTE: I asked for the lower sections to fade in as you reach
+   them so the page did not feel static after the homepage. Claude
+   built this as one shared utility rather than repeating it per
+   section, and I approved the change after reviewing it.
+   ================================================================ */
+const revealEls = document.querySelectorAll('.reveal');
+
+if (reduced || !('IntersectionObserver' in window)){
+  revealEls.forEach(el => el.classList.add('in'));
+} else {
+  const io = new IntersectionObserver((entries, obs) => {
+    for (const entry of entries){
+      if (entry.isIntersecting){
+        entry.target.classList.add('in');
+        obs.unobserve(entry.target);
+      }
+    }
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+  revealEls.forEach(el => io.observe(el));
+}
+</script>
+
+</body>
+</html>
