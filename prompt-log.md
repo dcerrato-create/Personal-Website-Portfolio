@@ -9,13 +9,13 @@
 ## About this log
 
 This is a record of the conversation I had with Claude Code while building
-my portfolio website. My prompts are copied verbatim, typos included. The
-replies are summarised down to the conversational substance — the actual
-code Claude produced is in `index.html` and is not repeated here, per the
-assignment note that the log does not need to include AI-produced files.
+my portfolio website. My prompts are copied verbatim, typos included. For 
+simplicty, Thereplies are summarised down to the conversational substance
+— the actualcode Claude produced is in `index.html` and is not repeated here.
+per the assignment note that the log does not need to include AI-produced files.
 
 The log is in chronological order and grouped by what I was working on at
-the time.
+the time, that way it is easier for TA's to review it. 
 
 **My workflow, which stayed the same throughout:**
 
