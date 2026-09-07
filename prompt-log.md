@@ -9,24 +9,13 @@
 ## About this log
 
 This is a record of the conversation I had with Claude Code while building
-my portfolio website. My prompts are copied verbatim, typos included. The
-replies are summarised down to the conversational substance — the actual
-code Claude produced is in `index.html` and is not repeated here, per the
-assignment note that the log does not need to include AI-produced files.
+my portfolio website. My prompts are copied verbatim, typos included. For 
+simplicty, Thereplies are summarised down to the conversational substance
+— the actualcode Claude produced is in `index.html` and is not repeated here.
+per the assignment note that the log does not need to include AI-produced files.
 
 The log is in chronological order and grouped by what I was working on at
-the time.
-
-**My workflow, which stayed the same throughout:**
-
-1. I described what I wanted in my own words before any code was written.
-2. I worked one section at a time and reviewed each before moving on.
-3. I spent extra time on the interactive features and rejected versions
-   that were not what I pictured.
-4. I supplied all of my own content — every link, document, photo and
-   piece of contact information.
-5. I reviewed and manually approved every single change. Several were
-   rejected outright and redone.
+the time, that way it is easier for TA's to review it. 
 
 ---
 
@@ -375,18 +364,3 @@ Final result: **0 errors, 0 warnings, 0 notices.**
 
 ---
 
-## What I learned
-
-- Being specific up front produced far better results than asking for
-  something vague. The homepage only worked once I described the exact
-  interaction I wanted rather than asking for "an animation."
-- It is worth rejecting output you do not like. My best section is the one
-  I sent back and made it rebuild from scratch.
-- AI is genuinely useful as a reviewer, not just a writer. It caught a
-  private company's funding figure heading onto a public page, personal
-  browser tabs visible in a screenshot I was about to publish, a wrong digit
-  in my own phone number, and a flaw in my reasoning about which GitHub link
-  was which.
-- Understanding what the code does matters more than writing it. I asked it
-  to remove a technical claim from my project card because I could not
-  explain it, and that was the right call.
