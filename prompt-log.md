@@ -287,13 +287,13 @@ in code rather than downloading it, and national flags are not copyrightable
 anyway. The only third-party asset on the whole site is the Inter typeface.
 
 **Me:** remove the inline SVG part, I wil lhave to explain my project in the
-future and if I dont understand I get points taken. Take that off. Next,
+future and it is better to include things I only understand completely, take that off. Next,
 what is the proper way for me to credit the font?
 
 **Claude:** Removed the claim and explained a proper font credit — typeface,
 designer, source and licence — then added it to the footer.
 
-**Me:** one very important requirement is code quality. Review all the code,
+**Me:** one very important requirement is code quality. Review the code,
 and check if it is in the highest, cleanest, and most efficient level of
 quality of my website. Keep the website as it is ... KEEP THE WEBSITE AS IT IS
 
