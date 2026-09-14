@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Crossy Road — David's Version</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐔</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="vignette"></div>
+
+  <div id="hud">
+    <div id="score">0</div>
+    <div id="best">TOP 0</div>
+    <div id="mode-pill" hidden></div>
+  </div>
+
+  <a id="back" href="../">&larr; Portfolio</a>
+
+  <div id="characters" class="panel" hidden>
+    <p class="sub brand">
+      <svg class="flag" viewBox="0 0 30 15" aria-hidden="true">
+        <rect width="30" height="15" fill="#0073cf"/>
+        <rect y="5" width="30" height="5" fill="#fff"/>
+        <g fill="#0073cf">
+          <rect x="14.2" y="6.7" width="1.6" height="1.6"/>
+          <rect x="10.2" y="5.6" width="1.6" height="1.6"/>
+          <rect x="10.2" y="7.8" width="1.6" height="1.6"/>
+          <rect x="18.2" y="5.6" width="1.6" height="1.6"/>
+          <rect x="18.2" y="7.8" width="1.6" height="1.6"/>
+        </g>
+      </svg>
+      Crossy Road &middot; David's Version
+    </p>
+    <h1>Choose your Character</h1>
+    <div id="char-grid" role="radiogroup" aria-label="Character"></div>
+    <p class="hint" id="char-hint">&larr; &rarr; to choose &middot; Enter to continue</p>
+  </div>
+
+  <div id="title" class="panel" hidden>
+    <h1>Crossy Road</h1>
+    <p class="sub">David's Version</p>
+    <div id="modes" role="radiogroup" aria-label="Difficulty"></div>
+    <p class="hint" id="menu-hint">&larr; &rarr; to choose &middot; Enter to play</p>
+    <button id="to-characters" class="link-btn" type="button">&larr; Change character</button>
+  </div>
+
+  <p id="ready" class="hint" hidden>Press &uarr; to start hopping</p>
+
+  <div id="gameover" class="panel" hidden>
+    <p id="cause"></p>
+    <p class="big" id="final">0</p>
+    <div class="actions">
+      <button id="again" class="btn" type="button">Play again</button>
+      <button id="menu" class="btn secondary" type="button">Difficulty</button>
+    </div>
+    <p class="hint" id="over-hint">Space to play again &middot; Esc to change difficulty</p>
+  </div>
+
+  <p id="error" hidden>The 3D library didn't load. Check your connection and refresh.</p>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
