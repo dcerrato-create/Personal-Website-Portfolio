@@ -15,6 +15,17 @@ are the instructions atached
 
 ---
 
+**Me:** *(answered via multiple-choice prompts, not typed prose)*
+- Do you have in-class Kiro code for the 30-minute sprint, and should we
+  build on it? → **Restart from scratch**
+- How do you want to get the 2.5D blocky look? → **Three.js via CDN
+  (Recommended)**
+- What theme should make it yours? → **I'll describe one**
+- How should we pace the build so your prompt log shows a real process? →
+  **I build, you steer**
+
+---
+
 **Me:** Before we begin, you understand the following: This is the same repo
 as my Project 1 portfolio website. Do not change or touch any existing files
 at the root - index.html, README.md, assets?, Informal-Reflection.md are all
@@ -30,6 +41,16 @@ regular crossy road right now and then focus on themes. I wnat to make sure
 the mechanics work first, as in the in-class experiment it wnet horrible for
 me. The name of my game will be crossy-road-david's version. For the in class
 kiro propmpt, we will do that once we work on the prompt log
+
+---
+
+**Me:** `/model claude-fable-5-1[1m]`
+
+---
+
+**Me:** `/model opus`
+
+continue
 
 ---
 
@@ -144,6 +165,10 @@ perfect in a single prompt, then I made minro fixes, then I added the
 difficlties with my unique speceficiations and then the characters, again
 with unique specifications. Nothing is known to be broken or unfinished, the
 game works on mobile or on computers.
+
+---
+
+**Me:** `/model sonnet`
 
 ---
 
