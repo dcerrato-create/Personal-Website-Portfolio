@@ -1,7 +1,7 @@
 # Prompt Log — Crossy Road: David's Version
 
 ## Description
-
+The prompt log is divided into two sections, the Kiro Prompts and the Claude Code prompts. Two important notes: 1. I used VS code with claude code integrated inside, all the claude prompts come from that. 2. I started from 0, so the Kiro prompts are just here to show them but they were not used in the final product of the game. 
 
 
 ## Kiro Prompts (In-Class Sprint)
