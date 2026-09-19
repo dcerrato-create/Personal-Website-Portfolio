@@ -6,7 +6,19 @@ The prompt log is divided into two sections, the Kiro Prompts and the Claude Cod
 
 ## Kiro Prompts (In-Class Sprint)
 
+1. I have 30 minute to build crossyroad as quick experiment. Use the fastest most efficient model too build the game.
 
+2. Run all required tasks
+
+3. Alright, time is almost over, give me a workable prototype atleast of what you have and we will go from there.
+
+4. steps for me to open it please
+
+5. Ok, this is terrible. The key doesn't work. The icons are bad, at least make them cars.
+
+6. Ok, keep the graphics, but make the mechanics work. They keys do not work
+
+7. Ok, this was for an assignment, can you send a copy a pastable version of ALL the prompts I gave TO YOU (no replies), including this one? All means ALL, don't skip one, and remember, only prompts I have to you
 
 ## Claude Code (VS Code)
 
