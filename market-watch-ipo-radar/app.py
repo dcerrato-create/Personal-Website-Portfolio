@@ -5,6 +5,7 @@ Run with:  python app.py   ->  http://127.0.0.1:5000
 All third-party API calls happen here on the server, so the Finnhub key in .env
 is never exposed to the browser.
 """
+import json
 import os
 from datetime import date, timedelta
 
@@ -23,6 +24,22 @@ DEFAULT_PAGE_SIZE = 20
 MAX_PAGE_SIZE = 100
 DEFAULT_STATS_SAMPLE = 100
 GENERAL_TTL_SECONDS = 60 * 60 * 6   # the full-population snapshot is expensive; 6 h
+# Render sets RENDER=true on its own; PRECOMPUTED_METRICS forces the same path locally.
+PRECOMPUTED_METRICS = bool(os.environ.get("RENDER") or os.environ.get("PRECOMPUTED_METRICS"))
+PRECOMPUTED_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+
+def _load_precomputed(years, exclude_spacs):
+    """Serve the snapshot committed to the repo, for hosts too small to compute it."""
+    name = f"general_metrics_{years}y_{'nospac' if exclude_spacs else 'all'}.json"
+    path = os.path.join(PRECOMPUTED_DIR, name)
+    try:
+        with open(path) as handle:
+            payload = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    payload["precomputed"] = True
+    return payload
 CALENDAR_ENRICH_LIMIT = 250
 
 
@@ -385,6 +402,15 @@ def api_ipo_general():
         return jsonify(exc.payload), exc.http_status
 
     population = [r for r in payload["ipos"] if not (exclude_spacs and r.get("is_spac"))]
+
+    # Render's free tier cannot do this: 800+ price lookups exhaust its memory and
+    # outrun the request timeout, taking the whole service down with it. The figures
+    # are a periodic snapshot rather than live data, so hosted instances serve one
+    # computed offline and committed to the repo. Locally it still computes for real.
+    if PRECOMPUTED_METRICS:
+        seeded = _load_precomputed(years, exclude_spacs)
+        if seeded is not None:
+            return jsonify(seeded)
 
     def _compute():
         enriched = ipo.enrich(population, force_refresh=_wants_refresh())

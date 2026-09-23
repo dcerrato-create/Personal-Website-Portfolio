@@ -1,0 +1,199 @@
+{
+  "backtest": [
+    {
+      "final_value": 897.9,
+      "invested": 1000.0,
+      "ipos": 44,
+      "mean_return_pct": -10.21,
+      "profit": -102.1,
+      "year": "2021"
+    },
+    {
+      "final_value": 862.9,
+      "invested": 1000.0,
+      "ipos": 77,
+      "mean_return_pct": -13.71,
+      "profit": -137.1,
+      "year": "2022"
+    },
+    {
+      "final_value": 920.3,
+      "invested": 1000.0,
+      "ipos": 98,
+      "mean_return_pct": -7.97,
+      "profit": -79.7,
+      "year": "2023"
+    },
+    {
+      "final_value": 984.4,
+      "invested": 1000.0,
+      "ipos": 159,
+      "mean_return_pct": -1.56,
+      "profit": -15.6,
+      "year": "2024"
+    },
+    {
+      "final_value": 1021.1,
+      "invested": 1000.0,
+      "ipos": 224,
+      "mean_return_pct": 2.11,
+      "profit": 21.1,
+      "year": "2025"
+    },
+    {
+      "final_value": 1011.9,
+      "invested": 1000.0,
+      "ipos": 148,
+      "mean_return_pct": 1.19,
+      "profit": 11.9,
+      "year": "2026"
+    }
+  ],
+  "computed_at": "2026-09-22",
+  "counts": {
+    "with_current_price": 906,
+    "with_day1": 755,
+    "with_month1": 750,
+    "with_six_month": 633
+  },
+  "excluded_spacs": false,
+  "holding_period": {
+    "avg_month1_from_day1_close_pct": -2.51,
+    "avg_six_month_pct": -10.76,
+    "pct_up_from_day1_close": 42.0
+  },
+  "population": 1395,
+  "returns": {
+    "avg_day1_pct": 22.28,
+    "avg_month1_pct": 11.15,
+    "best_day1": {
+      "ipo_date": "2022-08-05",
+      "name": "Magic Empire Global Ltd",
+      "sector": "Financial Services",
+      "symbol": "MEGL",
+      "value": 2300.75
+    },
+    "median_day1_pct": 0.2,
+    "worst_day1": {
+      "ipo_date": "2021-12-09",
+      "name": "NeuroSense Therapeutics Ltd.",
+      "sector": "Healthcare",
+      "symbol": "NRSN",
+      "value": -96.63
+    }
+  },
+  "risk_reward": {
+    "avg_gain_of_winners_pct": 74.76,
+    "avg_loss_of_losers_pct": -68.99,
+    "losers": 464,
+    "payoff_ratio": 1.08,
+    "win_loss_ratio": 0.94,
+    "winners": 438
+  },
+  "sample_size": 1395,
+  "sector_day1": [
+    {
+      "count": 17,
+      "key": "Real Estate",
+      "mean": 94.22
+    },
+    {
+      "count": 109,
+      "key": "Technology",
+      "mean": 38.1
+    },
+    {
+      "count": 19,
+      "key": "Unknown",
+      "mean": 37.2
+    },
+    {
+      "count": 25,
+      "key": "Communication Services",
+      "mean": 33.91
+    },
+    {
+      "count": 143,
+      "key": "Financial Services",
+      "mean": 26.15
+    },
+    {
+      "count": 22,
+      "key": "Basic Materials",
+      "mean": 25.85
+    },
+    {
+      "count": 34,
+      "key": "Consumer Defensive",
+      "mean": 18.93
+    },
+    {
+      "count": 4,
+      "key": "Utilities",
+      "mean": 17.91
+    },
+    {
+      "count": 66,
+      "key": "Consumer Cyclical",
+      "mean": 17.2
+    },
+    {
+      "count": 160,
+      "key": "Healthcare",
+      "mean": 12.14
+    },
+    {
+      "count": 131,
+      "key": "Industrials",
+      "mean": 11.29
+    },
+    {
+      "count": 25,
+      "key": "Energy",
+      "mean": -2.8
+    }
+  ],
+  "spacs_excluded": 0,
+  "status": "ok",
+  "total_priced": 1395,
+  "warnings": [],
+  "win_rates": {
+    "pct_net_gain_since_ipo": 48.3,
+    "pct_net_loss_since_ipo": 51.2,
+    "pct_up_day1": 52.1,
+    "pct_up_month1": 46.5
+  },
+  "year_over_year": [
+    {
+      "count": 44,
+      "key": "2021",
+      "mean": 5.26
+    },
+    {
+      "count": 77,
+      "key": "2022",
+      "mean": 96.12
+    },
+    {
+      "count": 98,
+      "key": "2023",
+      "mean": 18.72
+    },
+    {
+      "count": 159,
+      "key": "2024",
+      "mean": 5.98
+    },
+    {
+      "count": 224,
+      "key": "2025",
+      "mean": 22.0
+    },
+    {
+      "count": 153,
+      "key": "2026",
+      "mean": 9.65
+    }
+  ],
+  "years": 5
+}

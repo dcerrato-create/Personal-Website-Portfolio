@@ -1036,10 +1036,17 @@ async function loadGeneral(force, announce) {
     const data = await api(`/api/ipo/general?${params}`);
     target.innerHTML = renderGeneral(data);
     wireChartTooltips();
+    if (data.precomputed) {
+      button.title = 'This copy serves a stored snapshot; recomputing needs a local run.';
+      button.disabled = true;
+      button.textContent = 'Stored snapshot';
+      return;
+    }
+    button.textContent = 'Recalculate';
   } catch (err) {
     target.innerHTML = errorBlock(err);
   } finally {
-    button.disabled = false;
+    if (button.textContent !== 'Stored snapshot') button.disabled = false;
   }
 }
 
@@ -1148,8 +1155,12 @@ function renderGeneral(d) {
   const basis = `<div class="note">Computed across all ${d.population.toLocaleString()} IPOs
     <em>in our dataset</em> for the ${d.years}-year window${d.excluded_spacs ? ` (${d.spacs_excluded.toLocaleString()} SPACs excluded from ${d.total_priced.toLocaleString()} priced deals)` : ' (SPACs included)'} &mdash;
     the whole set rather than a sample of it, though the Finnhub free tier does not list every IPO that
-    happened. Snapshot taken ${escapeHtml(d.computed_at || '')} and cached, since it only moves as new
-    deals list and prices shift &mdash; hit Recalculate to force a fresh one.</div>`;
+    happened. ${d.precomputed
+    ? `Snapshot computed ${escapeHtml(d.computed_at || '')} and shipped with the app. Pricing 800+
+       companies live needs more memory than this free host has, so the hosted copy serves a stored
+       snapshot; run it locally and it recomputes for real on demand.`
+    : `Snapshot taken ${escapeHtml(d.computed_at || '')} and cached, since it only moves as new deals
+       list and prices shift &mdash; hit Recalculate to force a fresh one.`}</div>`;
 
   return warningBlock(d.warnings) + winRates + returns + holding + risk + yoy + sectors + backtest + basis;
 }
