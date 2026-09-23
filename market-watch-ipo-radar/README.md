@@ -1,3 +1,4 @@
+# Market Watch and IPO Radar
 Market Watch and IPO Radar is a Python dashboard that pulls five years of real IPO data and tries to 
 answer a question the usual stock apps don't: is investing in IPOs actually a winning strategy? It also 
 provides a broad macro market overview, but the distinguisher is the in depth IPO analysis. **The 
