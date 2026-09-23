@@ -1,0 +1,35 @@
+# Render's free tier puts a service to sleep after ~15 minutes idle, and waking it
+# again takes 30-60 seconds. This pings the dashboard so a visitor lands on a warm
+# instance instead of waiting for a cold start.
+#
+# Free instances only burn hours while awake, and Render allows 750 per month. The
+# schedule deliberately covers waking hours rather than the full day: 11:00-03:00
+# UTC is roughly 7am-11pm US Eastern, about 16 hours a day, so ~480 hours a month.
+# Pinging around the clock would use ~730 and leave almost no headroom.
+name: Keep dashboard awake
+
+on:
+  schedule:
+    - cron: "*/10 11-23,0-2 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the health endpoint
+        run: |
+          URL="https://market-watch-ipo-radar.onrender.com/api/health"
+          # A sleeping instance can take a while to wake, so allow for it and
+          # retry rather than failing the run on a single slow response.
+          for attempt in 1 2 3; do
+            code=$(curl -s -o /tmp/out.json -w "%{http_code}" --max-time 120 "$URL" || echo "000")
+            echo "attempt $attempt: HTTP $code"
+            if [ "$code" = "200" ]; then
+              cat /tmp/out.json
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "Dashboard did not respond after 3 attempts."
+          exit 1
