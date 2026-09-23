@@ -15,4 +15,4 @@ dashboard at [finnhub.io/dashboard](https://finnhub.io/dashboard). **The key is 
 `.gitignore`, so the key stays local and never enters the repository. **To install**, create a
 virtual environment with `python3 -m venv venv`, activate it with `source venv/bin/activate`, and
 run `pip install -r requirements.txt`. **To run**, execute `python app.py` and open
-**http://127.0.0.1:5000** in your browser.
+**http://127.0.0.1:5000** in your browser, or simply open it through my website. 
