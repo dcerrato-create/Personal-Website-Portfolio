@@ -118,10 +118,6 @@ All metrics refresh and update whenever the dashboard is refreshed (manual or au
 
 ---
 
-TE FALAT VERIFICAR EL 0.00% MEDIAN DAY 1 RETURN
-
----
-
 Add a 150 sample size, 25, 10, 5, 1
 
 ---
