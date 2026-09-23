@@ -443,5 +443,10 @@ def fetch_with_guard(fn):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    # Debug mode exposes the Werkzeug console, which is remote code execution if
+    # it ever faces the internet. Convenient locally, so it stays on by default
+    # and is switched off by FLASK_DEBUG=0. Deployments run under gunicorn, which
+    # imports the app directly and never executes this block.
+    debug = os.environ.get("FLASK_DEBUG", "1").lower() not in ("0", "false", "no")
     print(f"\n  Market Watch and IPO Radar running at http://127.0.0.1:{port}\n")
-    app.run(debug=True, port=port)
+    app.run(debug=debug, host="127.0.0.1", port=port)

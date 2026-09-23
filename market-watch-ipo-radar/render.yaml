@@ -1,0 +1,22 @@
+# Render deployment. The app lives in a subfolder of the portfolio repo, so
+# rootDir points at it.
+services:
+  - type: web
+    name: market-watch-ipo-radar
+    runtime: python
+    rootDir: market-watch-ipo-radar
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # Threads rather than extra workers: the free tier is memory-constrained and
+    # pandas is heavy. The long timeout matters because the first Analysis load
+    # computes across every IPO and takes well over gunicorn's 30s default.
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 300
+    envVars:
+      # sync:false means Render prompts for the value and it never enters the
+      # repo. Set the Finnhub key in the dashboard, not here.
+      - key: FINNHUB_API_KEY
+        sync: false
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: PYTHON_VERSION
+        value: "3.11.9"

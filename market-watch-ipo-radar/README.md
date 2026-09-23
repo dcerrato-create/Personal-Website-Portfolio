@@ -61,20 +61,6 @@ The Analysis tab excludes them by default.
 | [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance) | Index prices, post-IPO performance, sectors | No |
 | [Federal Reserve RSS](https://www.federalreserve.gov/feeds/) | FOMC statement + press releases | No |
 
-### How the API is called
-
-The IPO data comes from Finnhub's REST API, called with Python's **`requests`** module: a plain
-`GET` to `https://finnhub.io/api/v1/calendar/ipo` with three query parameters — `from` and `to` as
-`YYYY-MM-DD` dates, plus `token`, the API key read from the environment. It answers with JSON: an
-object holding an `ipoCalendar` list, where each deal is a dictionary of strings and numbers
-(`symbol`, `name`, `date`, `exchange`, `status`, `numberOfShares`, and `price`, which is a string
-that may be a single figure or a `"18.00-20.00"` range and so has to be parsed). Because Finnhub's
-free tier caps the date span per call, five years of history is fetched as a series of 90-day
-windows and stitched together. Two further sources fill in what Finnhub does not provide: the
-**`yfinance`** wrapper returns prices as pandas DataFrames (used for index quotes, post-IPO
-performance and the charts), and **`feedparser`** reads the Federal Reserve's RSS feeds for the
-FOMC statement and recent announcements.
-
 ### Two honest caveats
 
 - **Index proxies.** Yahoo Finance doesn't reliably carry the Wilshire 5000 or MSCI World
@@ -90,8 +76,8 @@ FOMC statement and recent announcements.
 Requires Python 3.9+.
 
 ```bash
-git clone https://github.com/dcerrato-create/Personal-Website-Portfolio.git
-cd Personal-Website-Portfolio/market-watch-ipo-radar
+git clone <your-repo-url>
+cd API-market-dashboard
 
 python3 -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
@@ -108,6 +94,25 @@ The key lives in `.env`, which is gitignored, and every API call happens server-
 is never exposed to the browser.
 
 The macro tab works without a key; only the IPO tabs need Finnhub.
+
+## Deploying it
+
+`render.yaml` configures a free Render web service. Because this is a Flask app with a secret key
+it **cannot** run on GitHub Pages — Pages serves static files only, and moving the key into browser
+JavaScript would expose it to every visitor. The key is set as an environment variable in Render's
+dashboard (`sync: false` in the config means it is never stored in the repo).
+
+Two honest caveats about the free tier:
+
+- **It sleeps.** After ~15 minutes idle the service spins down, so the next visitor waits for a cold
+  start. The on-disk cache is ephemeral there, so the Analysis snapshot is recomputed from scratch
+  after each wake — which is why gunicorn is configured with a 300-second timeout rather than the
+  30-second default.
+- **Shared IPs get rate limited sooner.** Yahoo Finance throttles by address, and cloud hosts share
+  them, so a deployed copy hits limits more readily than a local one. The app degrades to an error
+  message and recovers on the next refresh rather than caching the failure.
+
+Running locally avoids both problems, which is why the instructions above come first.
 
 ## How it's put together
 
