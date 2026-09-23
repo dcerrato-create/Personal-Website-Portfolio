@@ -1486,11 +1486,22 @@ footer .credit a:hover{ color:var(--accent-soft); }
           <li>Data Analysis</li>
         </ul>
 
-        <!-- AI NOTE — LINKS. This project is a Python/Flask app with a secret API
-             key, so unlike Crossy Road it cannot run on GitHub Pages; there is no
-             live link, and the README explains how to run it locally. Claude built
-             the card and I approved it. -->
+        <!-- AI NOTE — LINKS. This is a Python/Flask app with a secret API key, so
+             unlike Crossy Road it cannot run on GitHub Pages: Pages serves static
+             files only, and putting the key in browser JavaScript would expose it
+             to every visitor. It is deployed on Render instead, where the key lives
+             in an environment variable. Claude wired both links in and I approved
+             the change. -->
         <div class="proj-links">
+          <a class="link" href="https://market-watch-ipo-radar.onrender.com"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <path d="M15 3h6v6"/><path d="M10 14L21 3"/>
+            </svg>
+            Live Site
+          </a>
           <a class="link" href="https://github.com/dcerrato-create/Personal-Website-Portfolio/tree/main/market-watch-ipo-radar"
              target="_blank" rel="noopener">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
