@@ -65,6 +65,14 @@ hands back `NaN` for missing prices, and Python's `json` module happily writes b
 is invalid JSON that browsers refuse to parse, while Python's own parser accepts it. Invisible from
 the server side. Fixed with a `_safe_float()` helper that converts non-finite values to `None`.
 
+**The API was quietly lying and the code believed it.** Finnhub truncates any response at 200 rows
+with no error and no "there is more" flag. My 90-day chunking looked like sensible caution, but the
+late-2021 SPAC boom exceeds 200 IPOs in a quarter, so that one window came back capped and the
+history was short by 106 deals — and started two months later than it should have. Nothing looked
+broken; the number just happened to be 1,395 instead of 1,501. It only surfaced because I went
+looking for a speed win and probed how the API behaved at different date ranges. **Lesson: an API
+that returns HTTP 200 and well-formed JSON can still be giving you an incomplete answer.**
+
 **Chart label collision.** The first sector chart drew the longest bar's value label straight
 through the sector name next to it. Only visible in a screenshot — the code ran fine. Fixed by
 reserving label space in the bar scale.

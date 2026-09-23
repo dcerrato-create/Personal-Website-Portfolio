@@ -1,11 +1,11 @@
 {
   "backtest": [
     {
-      "final_value": 897.9,
+      "final_value": 912.2,
       "invested": 1000.0,
-      "ipos": 44,
-      "mean_return_pct": -10.21,
-      "profit": -102.1,
+      "ipos": 46,
+      "mean_return_pct": -8.78,
+      "profit": -87.8,
       "year": "2021"
     },
     {
@@ -17,55 +17,55 @@
       "year": "2022"
     },
     {
-      "final_value": 920.3,
+      "final_value": 921.2,
       "invested": 1000.0,
-      "ipos": 98,
-      "mean_return_pct": -7.97,
-      "profit": -79.7,
+      "ipos": 99,
+      "mean_return_pct": -7.88,
+      "profit": -78.8,
       "year": "2023"
     },
     {
-      "final_value": 984.4,
+      "final_value": 984.8,
       "invested": 1000.0,
-      "ipos": 159,
-      "mean_return_pct": -1.56,
-      "profit": -15.6,
+      "ipos": 163,
+      "mean_return_pct": -1.52,
+      "profit": -15.2,
       "year": "2024"
     },
     {
-      "final_value": 1021.1,
+      "final_value": 1020.8,
       "invested": 1000.0,
-      "ipos": 224,
-      "mean_return_pct": 2.11,
-      "profit": 21.1,
+      "ipos": 228,
+      "mean_return_pct": 2.08,
+      "profit": 20.8,
       "year": "2025"
     },
     {
-      "final_value": 1011.9,
+      "final_value": 1011.4,
       "invested": 1000.0,
-      "ipos": 148,
-      "mean_return_pct": 1.19,
-      "profit": 11.9,
+      "ipos": 160,
+      "mean_return_pct": 1.14,
+      "profit": 11.4,
       "year": "2026"
     }
   ],
-  "computed_at": "2026-09-22",
+  "computed_at": "2026-09-23",
   "counts": {
-    "with_current_price": 906,
-    "with_day1": 755,
-    "with_month1": 750,
-    "with_six_month": 633
+    "with_current_price": 947,
+    "with_day1": 781,
+    "with_month1": 773,
+    "with_six_month": 649
   },
   "excluded_spacs": false,
   "holding_period": {
-    "avg_month1_from_day1_close_pct": -2.51,
-    "avg_six_month_pct": -10.76,
-    "pct_up_from_day1_close": 42.0
+    "avg_month1_from_day1_close_pct": -2.37,
+    "avg_six_month_pct": -10.48,
+    "pct_up_from_day1_close": 43.6
   },
-  "population": 1395,
+  "population": 1501,
   "returns": {
-    "avg_day1_pct": 22.28,
-    "avg_month1_pct": 11.15,
+    "avg_day1_pct": 21.6,
+    "avg_month1_pct": 11.0,
     "best_day1": {
       "ipo_date": "2022-08-05",
       "name": "Magic Empire Global Ltd",
@@ -73,7 +73,7 @@
       "symbol": "MEGL",
       "value": 2300.75
     },
-    "median_day1_pct": 0.2,
+    "median_day1_pct": 0.12,
     "worst_day1": {
       "ipo_date": "2021-12-09",
       "name": "NeuroSense Therapeutics Ltd.",
@@ -83,14 +83,14 @@
     }
   },
   "risk_reward": {
-    "avg_gain_of_winners_pct": 74.76,
-    "avg_loss_of_losers_pct": -68.99,
-    "losers": 464,
+    "avg_gain_of_winners_pct": 73.66,
+    "avg_loss_of_losers_pct": -68.3,
+    "losers": 493,
     "payoff_ratio": 1.08,
-    "win_loss_ratio": 0.94,
-    "winners": 438
+    "win_loss_ratio": 0.91,
+    "winners": 451
   },
-  "sample_size": 1395,
+  "sample_size": 1501,
   "sector_day1": [
     {
       "count": 17,
@@ -103,24 +103,24 @@
       "mean": 38.1
     },
     {
-      "count": 19,
-      "key": "Unknown",
-      "mean": 37.2
-    },
-    {
       "count": 25,
       "key": "Communication Services",
       "mean": 33.91
     },
     {
-      "count": 143,
-      "key": "Financial Services",
-      "mean": 26.15
-    },
-    {
       "count": 22,
       "key": "Basic Materials",
       "mean": 25.85
+    },
+    {
+      "count": 149,
+      "key": "Financial Services",
+      "mean": 25.08
+    },
+    {
+      "count": 38,
+      "key": "Unknown",
+      "mean": 20.35
     },
     {
       "count": 34,
@@ -138,9 +138,9 @@
       "mean": 17.2
     },
     {
-      "count": 160,
+      "count": 161,
       "key": "Healthcare",
-      "mean": 12.14
+      "mean": 12.0
     },
     {
       "count": 131,
@@ -155,19 +155,19 @@
   ],
   "spacs_excluded": 0,
   "status": "ok",
-  "total_priced": 1395,
+  "total_priced": 1501,
   "warnings": [],
   "win_rates": {
-    "pct_net_gain_since_ipo": 48.3,
-    "pct_net_loss_since_ipo": 51.2,
-    "pct_up_day1": 52.1,
-    "pct_up_month1": 46.5
+    "pct_net_gain_since_ipo": 47.6,
+    "pct_net_loss_since_ipo": 52.1,
+    "pct_up_day1": 51.7,
+    "pct_up_month1": 47.3
   },
   "year_over_year": [
     {
-      "count": 44,
+      "count": 46,
       "key": "2021",
-      "mean": 5.26
+      "mean": 6.47
     },
     {
       "count": 77,
@@ -175,24 +175,24 @@
       "mean": 96.12
     },
     {
-      "count": 98,
+      "count": 99,
       "key": "2023",
-      "mean": 18.72
+      "mean": 18.54
     },
     {
-      "count": 159,
+      "count": 163,
       "key": "2024",
-      "mean": 5.98
+      "mean": 5.83
     },
     {
-      "count": 224,
+      "count": 228,
       "key": "2025",
-      "mean": 22.0
+      "mean": 21.62
     },
     {
-      "count": 153,
+      "count": 168,
       "key": "2026",
-      "mean": 9.65
+      "mean": 8.69
     }
   ],
   "years": 5

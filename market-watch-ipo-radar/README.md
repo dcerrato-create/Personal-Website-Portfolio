@@ -37,7 +37,7 @@ company, IPO date, offer price, estimated market cap at IPO, current price, % ch
 first-month % change, sector and listing market. Filterable by market, date range, and SPAC status.
 
 **Analysis** — two parts. *General metrics* is a snapshot across the **whole dataset** rather than a
-sample of it (all 823 non-SPAC deals Finnhub lists for the window — which is not every IPO that
+sample of it (all 869 non-SPAC deals Finnhub lists for the window — which is not every IPO that
 happened; see the coverage caveat above): win rates, day-1 / month-1 / six-month returns, holding-period
 analysis, sector and year-over-year breakdowns, and an equal-weight backtest. Because that means
 several hundred price lookups, the finished snapshot is cached and recomputed periodically. Below
@@ -46,7 +46,7 @@ it, a sampled breakdown of the most recent N IPOs by sector, with every deal in 
 ## Why the SPAC filter exists
 
 The single most surprising thing I found building this: **SPACs (blank-check shells) are the
-majority of the IPO calendar** — 572 of 1,395 listings in the five-year window. They all price at
+majority of the IPO calendar** — 632 of 1,501 listings in the five-year window. They all price at
 exactly $10.00, have no operating business, and therefore no sector and essentially no price
 movement. Left in, they drag every sector average toward zero and make the data look far more
 boring than it is. The dashboard flags them heuristically (name contains "Acquisition Corp" /
@@ -60,6 +60,25 @@ The Analysis tab excludes them by default.
 | [Finnhub](https://finnhub.io) `/calendar/ipo` | Upcoming + historical IPO deals | Yes (free) |
 | [yfinance](https://github.com/ranaroussi/yfinance) (Yahoo Finance) | Index prices, post-IPO performance, sectors | No |
 | [Federal Reserve RSS](https://www.federalreserve.gov/feeds/) | FOMC statement + press releases | No |
+
+### How the API is called
+
+The IPO data comes from Finnhub's REST API, called with Python's **`requests`** module: a plain
+`GET` to `https://finnhub.io/api/v1/calendar/ipo` with three query parameters — `from` and `to` as
+`YYYY-MM-DD` dates, plus `token`, the API key read from the environment. It answers with JSON: an
+object holding an `ipoCalendar` list, where each deal is a dictionary of strings and numbers
+(`symbol`, `name`, `date`, `exchange`, `status`, `numberOfShares`, and `price`, which is a string
+that may be a single figure or a `"18.00-20.00"` range and so has to be parsed). Two further sources
+fill in what Finnhub does not provide: the **`yfinance`** wrapper returns prices as pandas
+DataFrames (index quotes, post-IPO performance, the charts), and **`feedparser`** reads the Federal
+Reserve's RSS feeds for the FOMC statement and announcements.
+
+**The trap worth knowing about:** Finnhub silently truncates any response at **200 rows**. There is
+no error and no "more results" flag, so a wide date range looks like a complete answer while
+quietly dropping deals. History is therefore fetched in 90-day windows, and any window returning
+exactly 200 rows is halved and re-fetched until it comes back under the cap. This is not
+theoretical — the late-2021 SPAC boom exceeds 200 IPOs in a single quarter, and before this was
+handled the dataset was missing 106 deals and started two months later than it should have.
 
 ### Two honest caveats
 
@@ -76,8 +95,8 @@ The Analysis tab excludes them by default.
 Requires Python 3.9+.
 
 ```bash
-git clone <your-repo-url>
-cd API-market-dashboard
+git clone https://github.com/dcerrato-create/Personal-Website-Portfolio.git
+cd Personal-Website-Portfolio/market-watch-ipo-radar
 
 python3 -m venv venv
 source venv/bin/activate          # Windows: venv\Scripts\activate
@@ -151,7 +170,11 @@ Add `?refresh=true` to any GET to bypass the cache.
 
 ### Performance notes
 
-Two things make this usable rather than painfully slow:
+Three things make this usable rather than painfully slow:
+
+- **Parallel fetching.** The ~20 date-window calls run concurrently rather than serially with a
+  sleep between each, taking five years of history from about 29 seconds to under one. Twenty calls
+  in roughly two seconds sits well inside Finnhub's 60-per-minute allowance.
 
 - **Caching.** Every upstream response is cached to disk with a TTL suited to how fast it
   changes — 60s for index prices, 15 min for upcoming IPOs, 12 h for historical deals, 6 h for

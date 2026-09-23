@@ -31,7 +31,9 @@ QUOTE_BULK_SLEEP = 0.4
 QUOTE_BULK_ATTEMPTS = 3    # a bulk response can drop a live ticker; retry before giving up
 
 CHUNK_DAYS = 90            # Finnhub is happier with modest date windows
-CHUNK_SLEEP_SECONDS = 1.1  # free tier allows 60 calls/min
+FINNHUB_PAGE_CAP = 200     # the API silently truncates any response at 200 rows
+MAX_SPLIT_DEPTH = 3        # halve a capped window this many times before giving up
+FINNHUB_WORKERS = 4        # 20-odd calls finish in ~2s, far inside the 60/min budget
 FIRST_MONTH_TRADING_DAYS = 21
 SIX_MONTH_TRADING_DAYS = 126
 MAX_HISTORY_YEARS = 10     # past this, timedelta overflows on absurd input
@@ -141,20 +143,52 @@ def _normalize(raw):
 def _fetch_window(start, end, cache_key, ttl, force_refresh=False):
     """Pull a date window from Finnhub in chunks, tolerating partial failures."""
 
+    def _fetch_complete(window_start, window_end, depth=0):
+        """Fetch a window, halving it when the response hits Finnhub's row cap.
+
+        The API truncates at 200 rows without saying so. The late-2021 SPAC boom
+        exceeds that in a single 90-day window, so a fixed chunk size silently
+        loses IPOs; splitting until the response comes back under the cap is what
+        makes the history complete.
+        """
+        rows = _request_range(window_start.isoformat(), window_end.isoformat())
+        if len(rows) < FINNHUB_PAGE_CAP or depth >= MAX_SPLIT_DEPTH:
+            return rows
+        span = (window_end - window_start).days
+        if span < 2:
+            return rows
+        mid = window_start + timedelta(days=span // 2)
+        return (
+            _fetch_complete(window_start, mid, depth + 1)
+            + _fetch_complete(mid + timedelta(days=1), window_end, depth + 1)
+        )
+
     def _fetch():
-        rows, warnings = [], []
+        windows = []
         cursor = start
         while cursor <= end:
             chunk_end = min(cursor + timedelta(days=CHUNK_DAYS), end)
-            try:
-                rows.extend(_request_range(cursor.isoformat(), chunk_end.isoformat()))
-            except MissingAPIKey:
-                raise
-            except Exception as exc:
-                warnings.append(f"{cursor.isoformat()} to {chunk_end.isoformat()}: {exc}")
+            windows.append((cursor, chunk_end))
             cursor = chunk_end + timedelta(days=1)
-            if cursor <= end:
-                time.sleep(CHUNK_SLEEP_SECONDS)
+
+        rows, warnings = [], []
+
+        # Fetched concurrently rather than serially with a sleep between each:
+        # ~20 calls land in about two seconds and stay well inside the free tier's
+        # 60-per-minute allowance, instead of spending 20s asleep.
+        def _one(window):
+            return window, _fetch_complete(*window)
+
+        with ThreadPoolExecutor(max_workers=FINNHUB_WORKERS) as pool:
+            futures = [pool.submit(_one, w) for w in windows]
+            for future in futures:
+                try:
+                    _window, chunk_rows = future.result()
+                    rows.extend(chunk_rows)
+                except MissingAPIKey:
+                    raise
+                except Exception as exc:
+                    warnings.append(str(exc))
 
         seen, deduped = set(), []
         for raw in rows:
