@@ -7,6 +7,13 @@ switched to **Claude Opus 5** partway through the build.
 
 ## Key Prompts
 
+This is not the full conversation. Building this took far more prompts than what follows —
+dozens of smaller corrections, clarifications, follow-up questions and back-and-forth debugging.
+Listed below are the ones that actually shaped the project: the original spec, the feature
+requests, and the moments where I caught something wrong. Two messages are deliberately left
+out because they contained live credentials (my Finnhub API key and a GitHub token), which
+should never appear in a public repository.
+
 ---
 
 I'm building HW3: Explore an API for my 15-113 Effective Coding with AI course at CMU. I've attached the assignment instructions — please read them carefully first.
@@ -109,6 +116,9 @@ Backtested ROI (Optional):
 "If you invested $1000 equally in every IPO on day 1 and sold at month-end, total portfolio return by year"
 All metrics refresh and update whenever the dashboard is refreshed (manual or auto-refresh). None of this should be hallucinated, rather mathematically computed.
 
+---
+
+TE FALAT VERIFICAR EL 0.00% MEDIAN DAY 1 RETURN
 
 ---
 
