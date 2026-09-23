@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Market Watch and IPO Radar</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Market Watch and IPO Radar</h1>
+      <p class="tagline">Macro market context plus a deep view of the IPO market &mdash; who's going public next,
+        and how five years of past IPOs actually performed.</p>
+    </div>
+    <div class="controls">
+      <button id="refresh-btn" class="primary">Refresh now</button>
+      <label class="toggle">
+        <input type="checkbox" id="auto-refresh" checked>
+        Auto-refresh
+      </label>
+      <select id="interval" aria-label="Auto-refresh interval">
+        <option value="30">every 30s</option>
+        <option value="60" selected>every 60s</option>
+        <option value="300">every 5m</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="status-line">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">Starting up&hellip;</span>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="macro">Macro overview</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="upcoming">IPO calendar</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="history">IPO history</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="analysis">Analysis</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="individual">Individual IPO Data</button>
+  </div>
+
+  <!-- ============ MACRO ============ -->
+  <section class="panel" id="panel-macro" role="tabpanel">
+    <div class="card">
+      <h2>Markets today</h2>
+      <p class="sub">Last price, change vs. previous close, and the previous close itself. Total-market,
+        world and emerging-market exposure use liquid ETF proxies (VTI / VT / VWO), since Yahoo Finance
+        doesn't carry those underlying indices reliably.</p>
+      <div class="tiles" id="indices-tiles">
+        <div class="state">Loading market data&hellip;</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Federal Reserve</h2>
+      <p class="sub">Straight from the Fed's official press-release RSS feeds.</p>
+      <div id="fed-content">
+        <div class="state">Loading Fed announcements&hellip;</div>
+      </div>
+    </div>
+
+    <details class="disclaimer">
+      <summary>Prices are delayed, and three of these six are ETF proxies, not the indices themselves.</summary>
+      <p><strong>Where this comes from.</strong> Index and ETF prices come from Yahoo Finance via the
+        <code>yfinance</code> library. Fed content comes from the Federal Reserve's own press-release
+        RSS feeds, with the FOMC statement text extracted from the release page on
+        federalreserve.gov.</p>
+      <p><strong>What to watch out for.</strong> Yahoo's data is delayed, not live, and outside market
+        hours the &ldquo;last price&rdquo; is simply the most recent close &mdash; so a 0.00% change may just
+        mean the market is shut. Total US, total world and emerging-market rows track the VTI, VT and
+        VWO ETFs, because Yahoo doesn't reliably carry the underlying indices; ETFs follow their
+        index closely but are not identical to it and carry their own fees and tracking error. The
+        FOMC summary is an automated extract of the first paragraphs of the press release, so it can
+        miss context or vote details &mdash; always read the linked original.</p>
+      <p><strong>Not financial advice.</strong> Use this as an at-a-glance snapshot and confirm any
+        figure against the Fed's own site or a primary market-data source before relying on it.</p>
+    </details>
+  </section>
+
+  <!-- ============ UPCOMING ============ -->
+  <section class="panel" id="panel-upcoming" role="tabpanel" hidden>
+    <div class="card">
+      <h2>IPO calendar</h2>
+      <p class="sub" id="cal-coverage-note">Upcoming deals plus recently priced ones. Click any deal for full details.</p>
+
+      <div class="filters">
+        <div class="field">
+          <label for="up-start-btn">From</label>
+          <input type="hidden" id="up-start">
+          <button type="button" class="dp-trigger" id="up-start-btn"></button>
+        </div>
+        <div class="field">
+          <label for="up-end-btn">To</label>
+          <input type="hidden" id="up-end">
+          <button type="button" class="dp-trigger" id="up-end-btn"></button>
+        </div>
+        <div class="field">
+          <label for="up-q">Search</label>
+          <input type="search" id="up-q" placeholder="Ticker or company" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Quick range</label>
+          <div class="presets" id="up-presets">
+            <button data-back="90" data-fwd="0">Last 90d</button>
+            <button data-back="30" data-fwd="30" aria-pressed="true">±30d</button>
+            <button data-back="0" data-fwd="90">Next 90d</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>View</label>
+          <div class="presets" id="up-view">
+            <button data-view="calendar" aria-pressed="true">Calendar</button>
+            <button data-view="table">Table</button>
+          </div>
+        </div>
+        <button id="up-apply">Apply</button>
+      </div>
+
+      <div class="cal-legend">
+        <span><i class="key key-upcoming"></i> Upcoming (expected to price)</span>
+        <span><i class="key key-up"></i> &#9650; Priced &mdash; above offer price</span>
+        <span><i class="key key-down"></i> &#9660; Priced &mdash; below offer price</span>
+        <span><i class="key key-priced"></i> Priced &mdash; no price data</span>
+      </div>
+
+      <div id="upcoming-content">
+        <div class="state">Loading IPO calendar&hellip;</div>
+      </div>
+    </div>
+
+    <details class="disclaimer">
+      <summary>This calendar is shorter than Yahoo's or Nasdaq's &mdash; it only lists deals with a
+        confirmed date. Expect IPOs to be missing.</summary>
+      <p><strong>Where this comes from.</strong> Finnhub's IPO calendar endpoint, on a free API tier.</p>
+      <p><strong>Why deals are missing.</strong> This feed lists deals that already have a confirmed
+        expected pricing date &mdash; typically companies a week or two from listing. Companies that have
+        filed an S-1 with the SEC but haven't set a date yet <em>do not appear here</em>, and that
+        pipeline is far larger than the confirmed list. Sites like Yahoo Finance and Nasdaq show those
+        filings too, which is why their calendars look much fuller. Smaller, foreign and
+        over-the-counter listings may also be absent. We have not verified how this free tier's
+        coverage compares to Finnhub's paid tiers, so assume this is a floor, not a complete picture.</p>
+      <p><strong>Details change.</strong> Offer prices shown as a range are the filing range, not the
+        final price. Dates slip, price ranges get revised, and deals get pulled outright &mdash; sometimes
+        hours before listing.</p>
+      <p><strong>Not financial advice.</strong> Before drawing any conclusion about a deal here, go to
+        the source: the company's S-1/424B prospectus on SEC EDGAR and the underwriters' final terms.
+        Note also that the offer price shown is the price institutions pay at allocation, not a price
+        generally available on the open market.</p>
+    </details>
+  </section>
+
+  <!-- ============ HISTORY ============ -->
+  <section class="panel" id="panel-history" role="tabpanel" hidden>
+    <div class="card">
+      <h2>IPO history</h2>
+      <p class="sub">Every priced IPO Finnhub has for the selected window, enriched page by page with
+        sector and post-IPO performance from Yahoo Finance.</p>
+
+      <div class="filters">
+        <div class="field">
+          <label for="hist-q">Search</label>
+          <input type="search" id="hist-q" placeholder="Ticker or company" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="hist-years">Lookback</label>
+          <select id="hist-years">
+            <option value="1">1 year</option>
+            <option value="3">3 years</option>
+            <option value="5" selected>5 years</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="hist-exchange">Market</label>
+          <select id="hist-exchange"><option value="All">All markets</option></select>
+        </div>
+        <div class="field">
+          <label for="hist-start-btn">From</label>
+          <input type="hidden" id="hist-start">
+          <button type="button" class="dp-trigger" id="hist-start-btn"></button>
+        </div>
+        <div class="field">
+          <label for="hist-end-btn">To</label>
+          <input type="hidden" id="hist-end">
+          <button type="button" class="dp-trigger" id="hist-end-btn"></button>
+        </div>
+        <div class="field">
+          <label for="hist-page-size">Rows</label>
+          <select id="hist-page-size">
+            <option value="10">10</option>
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <label class="toggle"><input type="checkbox" id="hist-no-spacs"> Hide SPACs</label>
+        <button id="hist-apply">Apply</button>
+      </div>
+
+      <div id="history-content">
+        <div class="state">Loading IPO history&hellip;</div>
+      </div>
+    </div>
+
+    <details class="disclaimer">
+      <summary>Market cap at IPO is an estimate, the SPAC tag is a guess, and companies that
+        disappeared leave gaps.</summary>
+      <p><strong>Where this comes from.</strong> Deal facts &mdash; ticker, company, date, offer price,
+        shares offered, exchange &mdash; come from Finnhub. Sector, industry, current price and all
+        performance figures come from Yahoo Finance, looked up per ticker.</p>
+      <p><strong>Est. market cap at IPO is genuinely an estimate.</strong> It's the offer price
+        multiplied by the company's <em>current</em> shares outstanding, because no free source
+        publishes at-IPO share counts. Any company that has issued or bought back stock since listing
+        will be overstated or understated &mdash; sometimes badly. Treat it as an order of magnitude, not
+        a figure to quote.</p>
+      <p><strong>Gaps and mislabels.</strong> Coverage starts in late October 2021, so anything older
+        is absent. Tickers that were acquired, delisted or renamed often return no market data and
+        show as &mdash;. The SPAC tag is a heuristic based on company name and a $10.00 offer price, so it
+        will occasionally mislabel an operating company, or miss a SPAC with an unusual name.</p>
+      <p><strong>Not financial advice.</strong> Past IPO performance says nothing about future deals.
+        Verify any specific company against SEC EDGAR and a primary market-data source before drawing
+        conclusions about it.</p>
+    </details>
+  </section>
+
+  <!-- ============ ANALYSIS ============ -->
+  <section class="panel" id="panel-analysis" role="tabpanel" hidden>
+    <div class="card">
+      <h2>General metrics</h2>
+      <p class="sub"><strong>Is investing in IPOs a winning strategy?</strong> A snapshot across the
+        <em>whole</em> five-year dataset rather than a sample of it &mdash; meaning every IPO the Finnhub
+        free tier lists, which is not every IPO that happened. Day 1 is the first trading day's
+        close against the offer price, month 1 is 21 trading days in, six months is 126. IPOs too
+        young to have reached a milestone are left out of that metric rather than measured over a
+        shorter window.</p>
+
+      <div class="filters">
+        <label class="toggle"><input type="checkbox" id="gen-no-spacs" checked> Exclude SPACs</label>
+        <button id="gen-apply">Recalculate</button>
+      </div>
+
+      <div id="general-content">
+        <div class="state">Loading general metrics&hellip;</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>How have recent IPOs performed?</h2>
+      <p class="sub">Computed over the most recent priced IPOs in the lookback window. Each ticker needs its
+        own Yahoo Finance lookup, so the first run takes a moment &mdash; results are cached afterwards.</p>
+
+      <div class="filters">
+        <div class="field">
+          <label for="stats-sample">Sample size</label>
+          <select id="stats-sample">
+            <option value="1">1 IPO</option>
+            <option value="5">5 IPOs</option>
+            <option value="10">10 IPOs</option>
+            <option value="25">25 IPOs</option>
+            <option value="50">50 IPOs</option>
+            <option value="100" selected>100 IPOs</option>
+            <option value="150">150 IPOs</option>
+            <option value="200">200 IPOs</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="stats-threshold">First-month gain over</label>
+          <select id="stats-threshold">
+            <option value="25">25%</option>
+            <option value="50" selected>50%</option>
+            <option value="100">100%</option>
+          </select>
+        </div>
+        <label class="toggle"><input type="checkbox" id="stats-no-spacs" checked> Exclude SPACs</label>
+        <button id="stats-apply">Run analysis</button>
+      </div>
+
+      <div id="stats-content">
+        <div class="state">Choose your options and hit &ldquo;Run analysis&rdquo;.</div>
+      </div>
+    </div>
+
+    <details class="disclaimer">
+      <summary>These averages are flattered by survivorship bias &mdash; roughly a fifth of the IPOs
+        have vanished from the data. Read them as directional, not as a measured return.</summary>
+      <p><strong>How these numbers are built.</strong> General metrics cover the entire dataset rather
+        than a sample of it &mdash; all 823 non-SPAC deals Finnhub lists for the window. That is not the
+        same as every IPO that took place: this feed misses deals, as the calendar tab explains, so read
+        it as a census of what we can see, not of the market. That takes several hundred price lookups,
+        so the finished snapshot is cached and recomputed periodically rather than on every load;
+        Recalculate forces a fresh one. The breakdown further down is different: it samples the most
+        recent N deals, and that sample size is yours to change.</p>
+      <p><strong>Prices are split-adjusted back to what actually traded.</strong> Yahoo restates old
+        prices for later stock splits, while the offer price is the original unadjusted figure.
+        Compared naively, a failed micro-cap that did repeated reverse splits shows up as a
+        six-figure percentage gain &mdash; one in this dataset computed to +100,210,425% before the
+        correction. Every historical close here is multiplied back by the splits since listing.</p>
+      <p><strong>Survivorship bias is the big one.</strong> Companies that went bankrupt, got delisted
+        or were acquired often return no price data, so they silently drop out of the averages. You can
+        see the size of it: of the 823 IPOs in our dataset for this window, only about 665 still return
+        a current price.
+        The missing ~19% are overwhelmingly failures rather than successes, so every return figure here
+        is <em>more optimistic</em> than reality.</p>
+      <p><strong>Other things that skew it.</strong> The sample is the most recent IPOs, so it's
+        weighted toward companies that have had little time to fall &mdash; recency bias on top of
+        survivorship. Sectors with only one or two IPOs produce averages that are noise, so check the
+        count in the tooltip before believing a bar. &ldquo;First month&rdquo; means roughly 21 trading days
+        measured <em>from the offer price</em>, which is not a return most investors could have earned &mdash;
+        retail buyers typically enter at the day-one open, often well above offer. SPACs are excluded
+        by default via a name-and-price heuristic that isn't perfect.</p>
+      <p><strong>Not financial advice.</strong> This is exploratory analysis on free data, not
+        research. It's a guide to where to look next &mdash; do proper due diligence from primary sources
+        before drawing any investment conclusion.</p>
+    </details>
+  </section>
+
+  <!-- ============ INDIVIDUAL ============ -->
+  <section class="panel" id="panel-individual" role="tabpanel" hidden>
+    <div class="card">
+      <h2>Individual IPO Data</h2>
+      <p class="sub">Search any of the IPOs in our database by ticker or company name, then chart its
+        price over any window from one day to its entire history.</p>
+
+      <div class="filters">
+        <div class="field" style="flex:1;min-width:260px">
+          <label for="ind-q">Search IPOs</label>
+          <input type="search" id="ind-q" placeholder="e.g. Reddit, RDDT, therapeutics" autocomplete="off">
+        </div>
+      </div>
+
+      <div id="ind-results"></div>
+      <div id="ind-detail">
+        <div class="state">Search for a company above to see its details and price chart.</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">
+    <strong>Not financial advice.</strong> <strong>Every figure on this dashboard comes from free,
+    public API tiers &mdash; not paid, professional market data.</strong> Free feeds are delayed, thinner
+    than their commercial equivalents, and occasionally wrong; entire deals can be missing with no
+    indication that anything is absent. Market Watch and IPO Radar is a research and exploration tool. Treat it as a
+    guide for deciding where to look next, never as a basis for an investment decision, and verify
+    anything that matters against SEC filings and the company's own prospectus.
+  </p>
+
+</div>
+
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+
+<div class="dp-pop" id="dp-pop" hidden role="dialog" aria-label="Choose a date">
+  <div class="dp-head">
+    <button type="button" class="dp-nav" data-step="-12" title="Back one year" aria-label="Back one year">&laquo;</button>
+    <button type="button" class="dp-nav" data-step="-1" title="Back one month" aria-label="Back one month">&lsaquo;</button>
+    <span class="dp-label" id="dp-label" aria-live="polite"></span>
+    <button type="button" class="dp-nav" data-step="1" title="Forward one month" aria-label="Forward one month">&rsaquo;</button>
+    <button type="button" class="dp-nav" data-step="12" title="Forward one year" aria-label="Forward one year">&raquo;</button>
+  </div>
+  <div class="dp-grid dp-dow" id="dp-dow"></div>
+  <div class="dp-grid" id="dp-grid"></div>
+  <div class="dp-foot" id="dp-foot"></div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

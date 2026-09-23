@@ -1458,14 +1458,48 @@ footer .credit a:hover{ color:var(--accent-soft); }
         </div>
       </article>
 
-      <!-- 03 — reserved -->
-      <article class="proj-card is-empty reveal" style="--d:.12s">
-        <div class="proj-thumb"></div>
+      <!-- 03 — Market Watch and IPO Radar (HW3: Explore an API) -->
+      <article class="proj-card reveal" style="--d:.12s">
+        <div class="proj-thumb">
+          <img src="assets/project-ipo-radar.jpg" loading="lazy" decoding="async"
+               alt="The Analysis tab of Market Watch and IPO Radar, showing win-rate and return
+                    statistics computed across 823 IPOs">
+        </div>
 
         <span class="proj-num">03</span>
-        <h3 class="proj-title">Project Three</h3>
-        <p class="proj-desc">Reserved for later projects&hellip;</p>
-        <span class="proj-soon">Coming soon</span>
+        <h3 class="proj-title">Market Watch and IPO Radar</h3>
+        <p class="proj-desc">
+          A market dashboard built around a question the usual stock apps don't answer:
+          is investing in IPOs actually a winning strategy? It pulls five years of IPO
+          deals from the Finnhub API and prices them against Yahoo Finance, then reports
+          what really happened &mdash; only about 30% of those IPOs still trade above their
+          offer price, and buying at the first day's close instead lost 2.9% over the
+          following month. Alongside that sit live index prices, the latest Fed statement,
+          a searchable IPO calendar and a per-company price explorer.
+        </p>
+
+        <ul class="pills sm">
+          <li>Python</li>
+          <li>Flask</li>
+          <li>REST APIs</li>
+          <li>JavaScript</li>
+          <li>Data Analysis</li>
+        </ul>
+
+        <!-- AI NOTE — LINKS. This project is a Python/Flask app with a secret API
+             key, so unlike Crossy Road it cannot run on GitHub Pages; there is no
+             live link, and the README explains how to run it locally. Claude built
+             the card and I approved it. -->
+        <div class="proj-links">
+          <a class="link" href="https://github.com/dcerrato-create/Personal-Website-Portfolio/tree/main/market-watch-ipo-radar"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/>
+            </svg>
+            GitHub Repository
+          </a>
+        </div>
       </article>
 
       <!-- 04 — reserved -->
