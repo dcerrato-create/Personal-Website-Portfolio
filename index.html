@@ -1515,16 +1515,23 @@ footer .credit a:hover{ color:var(--accent-soft); }
       <!-- 04 — Stock Lookup
            AI NOTE: I asked Claude for a simple stock lookup page on this site
            backed by a separate Flask API on Render, and for this card to follow
-           the same format as the others. I approved the change. -->
+           the same format as the others. Claude took the screenshot from the
+           live page. I approved the change. -->
       <article class="proj-card reveal" style="--d:.18s">
-        <div class="proj-thumb"></div>
+        <div class="proj-thumb">
+          <img src="assets/project-stock-lookup.jpg" loading="lazy" decoding="async"
+               alt="David's Stock Lookup showing a quote card for Apple with its price, daily change and key stats">
+        </div>
 
         <span class="proj-num">04</span>
         <h3 class="proj-title">Stock Lookup</h3>
         <p class="proj-desc">
-          Type a ticker and get its current price and daily change. The page on
-          this site sends the ticker to my own Flask backend on Render, which
-          calls the Finnhub API with a key that never leaves the server.
+          Search any company by ticker or name to get its live price, daily move
+          and key numbers. The page calls my own Flask backend on Render, which
+          calls the Finnhub API with a key that never leaves the server. It works
+          with stocks, ADRs, ETFs and even penny stocks, but not with indexes;
+          those limits are already handled, with clear notes and error messages
+          (searching an index, for example, points you to an ETF that tracks it).
         </p>
 
         <ul class="pills sm">
