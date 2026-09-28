@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Look up live prices and key numbers for US-listed stocks.">
+<title>David's Stock Lookup</title>
+
+<!-- Same font as the portfolio -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* Tokens copied from the portfolio's :root so both pages feel like one site */
+:root{
+  --ink:        #05070a;
+  --ink-2:      #090d14;
+  --line:       rgba(255,255,255,.09);
+  --text:       #e8edf4;
+  --muted:      #7d8a9c;
+  --muted-dim:  #586373;
+  --accent:     #2f9be8;
+  --accent-soft:#7cc6f5;
+  --up:         #3fcf8e;
+  --down:       #f0616d;
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background:var(--ink);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+main{
+  max-width:760px;
+  margin:0 auto;
+  padding:clamp(40px, 8vh, 88px) clamp(16px, 5vw, 48px) 64px;
+}
+
+/* ---- Header ---- */
+.back{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:9px 16px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--muted);
+  text-decoration:none;
+  font-size:.67rem; font-weight:600;
+  letter-spacing:.13em; text-transform:uppercase;
+  transition:color .28s var(--ease), border-color .28s var(--ease), background .28s var(--ease);
+  margin-bottom:clamp(36px, 6vh, 56px);
+}
+.back:hover{ color:var(--accent-soft); border-color:rgba(47,155,232,.55); background:rgba(47,155,232,.08); }
+.back:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+.coverage{
+  font-size:.82rem; line-height:1.6;
+  color:var(--muted);
+  padding:12px 16px;
+  border:1px solid rgba(47,155,232,.25);
+  border-radius:12px;
+  background:rgba(47,155,232,.06);
+  margin-bottom:36px;
+}
+.coverage strong{ color:var(--text); font-weight:600; }
+
+/* Stock / ETF label, used in suggestions and on the result card */
+.badge{
+  font-family:var(--mono); font-size:.62rem; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  flex:none;
+}
+.badge.etf{ color:#f5c26b; border-color:rgba(245,194,107,.35); background:rgba(245,194,107,.08); }
+.badge.stock{ color:var(--accent-soft); border-color:rgba(47,155,232,.35); background:rgba(47,155,232,.08); }
+
+.eyebrow{
+  display:flex; align-items:center; gap:14px;
+  font-size:.7rem; font-weight:600;
+  letter-spacing:.3em; text-transform:uppercase;
+  color:var(--accent);
+  margin-bottom:22px;
+}
+.eyebrow::after{
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right, var(--line), transparent);
+}
+
+h1{
+  font-size:clamp(2rem, 6vw, 3.2rem);
+  font-weight:700; letter-spacing:-.03em;
+  line-height:1.05;
+  margin-bottom:16px;
+}
+.intro{
+  font-size:clamp(1rem, 1.5vw, 1.08rem);
+  line-height:1.7;
+  color:var(--muted);
+  max-width:56ch;
+  margin-bottom:32px;
+}
+
+/* ---- Search ---- */
+.search-row{ display:flex; gap:10px; }
+.combo{ position:relative; flex:1; min-width:0; }
+
+#ticker{
+  width:100%;
+  font:inherit; font-size:1rem;
+  color:var(--text);
+  background:var(--ink-2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:14px 16px;
+  outline:none;
+  transition:border-color .2s var(--ease);
+}
+#ticker::placeholder{ color:var(--muted-dim); }
+#ticker:focus{ border-color:rgba(47,155,232,.6); }
+
+.btn{
+  font:inherit; font-size:.8rem; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:#fff;
+  background:var(--accent);
+  border:none;
+  border-radius:12px;
+  padding:0 22px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .2s var(--ease), opacity .2s var(--ease);
+}
+.btn:hover{ background:#1f8ad6; }
+.btn:focus-visible{ outline:2px solid var(--accent-soft); outline-offset:3px; }
+.btn:disabled{ opacity:.5; cursor:default; }
+
+/* Autocomplete dropdown */
+#suggestions{
+  position:absolute; top:calc(100% + 6px); left:0; right:0;
+  z-index:10;
+  list-style:none;
+  background:var(--ink-2);
+  border:1px solid rgba(47,155,232,.35);
+  border-radius:12px;
+  padding:6px;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);
+}
+#suggestions[hidden]{ display:none; }
+#suggestions li{
+  display:flex; gap:12px; align-items:baseline;
+  padding:10px 12px;
+  border-radius:8px;
+  font-size:.92rem;
+  cursor:pointer;
+}
+#suggestions li .sym{ font-family:var(--mono); font-weight:600; color:var(--accent-soft); min-width:4.5em; }
+#suggestions li .nm{ flex:1; min-width:0; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#suggestions li{ align-items:center; }
+#suggestions li.active, #suggestions li:hover{ background:rgba(47,155,232,.12); }
+#suggestions li.note{ color:var(--muted-dim); cursor:default; background:none; }
+
+/* Quick picks: same look as the portfolio's skill pills */
+.picks{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:16px; }
+.picks span{ font-size:.75rem; color:var(--muted-dim); margin-right:2px; }
+.pick{
+  font-family:var(--mono); font-size:.78rem;
+  color:var(--muted);
+  padding:8px 16px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--ink-2);
+  cursor:pointer;
+  transition:color .28s var(--ease), border-color .28s var(--ease),
+             background .28s var(--ease), transform .28s var(--ease);
+}
+.pick:hover{ color:var(--text); border-color:rgba(47,155,232,.5); background:rgba(47,155,232,.08); transform:translateY(-2px); }
+.pick:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+.pick:disabled{ opacity:.5; cursor:default; transform:none; }
+
+/* ---- Status + result ---- */
+#status{ margin-top:28px; min-height:1.5em; color:var(--muted); font-size:.95rem; }
+#status.error{ color:var(--down); }
+
+.card{
+  margin-top:12px;
+  padding:clamp(20px, 3vw, 28px);
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--ink-2);
+}
+.card[hidden]{ display:none; }
+
+.company{ display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+.logo{
+  width:48px; height:48px; flex:none;
+  border-radius:12px;
+  background:#fff;
+  object-fit:contain;
+  padding:6px;
+}
+.monogram{
+  width:48px; height:48px; flex:none;
+  border-radius:12px;
+  display:grid; place-items:center;
+  background:rgba(47,155,232,.14);
+  color:var(--accent-soft);
+  font-weight:700; font-size:1.2rem;
+}
+.company h2{ font-size:1.15rem; font-weight:600; letter-spacing:-.01em; }
+.company .sym{ display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:.8rem; color:var(--muted); margin-top:4px; }
+
+.price{
+  font-size:clamp(2.4rem, 8vw, 3.4rem);
+  font-weight:700; letter-spacing:-.03em;
+  line-height:1;
+}
+.change{ margin-top:10px; font-weight:600; font-size:1rem; }
+.change.up{ color:var(--up); }
+.change.down{ color:var(--down); }
+.change.flat{ color:var(--muted); }
+.as-of{ margin-top:6px; font-size:.78rem; color:var(--muted-dim); }
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+  gap:1px;
+  margin-top:26px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+  background:var(--line);
+}
+.stat{ background:var(--ink-2); padding:14px 16px; }
+.stat dt{
+  font-size:.66rem; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted-dim);
+  margin-bottom:6px;
+}
+.stat dd{ font-family:var(--mono); font-size:.95rem; color:var(--text); }
+
+.notes{ list-style:none; margin-top:14px; }
+.notes li{ font-size:.8rem; line-height:1.55; color:var(--muted); padding-left:18px; position:relative; }
+.notes li::before{ content:"ⓘ"; position:absolute; left:0; color:var(--accent-soft); }
+
+.credit{ margin-top:40px; font-size:.78rem; color:var(--muted-dim); line-height:1.6; }
+.credit a{ color:var(--muted); }
+.credit a:hover{ color:var(--accent-soft); }
+
+@media (max-width:480px){
+  .search-row{ flex-direction:column; }
+  .btn{ padding:14px 22px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="../">&larr; Back to portfolio</a>
+
+  <p class="coverage">
+    <strong>Works with:</strong> US stocks, ADRs and ETFs.
+    <strong>Not available:</strong> mutual funds, and indexes like the S&amp;P 500, so use an ETF that tracks them instead (SPY, DIA, QQQ).
+  </p>
+
+  <div class="eyebrow">Project 04</div>
+  <h1>David's Stock Lookup</h1>
+  <p class="intro">
+    Search any US-listed company by ticker or name to see its live price,
+    today's move and a few key numbers.
+  </p>
+
+  <form id="quote-form" autocomplete="off">
+    <div class="search-row">
+      <div class="combo">
+        <input id="ticker" type="text" placeholder="Ticker or company, e.g. AAPL or Apple"
+               role="combobox" aria-label="Ticker or company name"
+               aria-autocomplete="list" aria-expanded="false" aria-controls="suggestions">
+        <ul id="suggestions" role="listbox" hidden></ul>
+      </div>
+      <button id="submit" class="btn" type="submit">Get Quote</button>
+    </div>
+  </form>
+
+  <div class="picks">
+    <span>Try:</span>
+    <button class="pick" type="button">AAPL</button>
+    <button class="pick" type="button">NVDA</button>
+    <button class="pick" type="button">MSFT</button>
+    <button class="pick" type="button">TSLA</button>
+    <button class="pick" type="button">SPY</button>
+  </div>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <section id="card" class="card" hidden>
+    <div class="company">
+      <div id="logo-slot"></div>
+      <div>
+        <h2 id="name"></h2>
+        <div id="sym" class="sym"></div>
+      </div>
+    </div>
+    <div id="price" class="price"></div>
+    <div id="change" class="change"></div>
+    <div id="as-of" class="as-of"></div>
+    <dl id="stats" class="stats"></dl>
+    <ul id="notes" class="notes"></ul>
+  </section>
+
+  <p class="credit">
+    Market data from <a href="https://finnhub.io" target="_blank" rel="noopener">Finnhub</a>,
+    fetched through my own Flask backend on Render so the API key never reaches the browser.
+  </p>
+</main>
+
+<script>
+  const BACKEND_URL = "https://stock-quote-api-t5yy.onrender.com";
+  const TIMEOUT_MS = 70000; // Render's free tier can take ~50s to wake up
+
+  const form = document.getElementById("quote-form");
+  const input = document.getElementById("ticker");
+  const button = document.getElementById("submit");
+  const list = document.getElementById("suggestions");
+  const statusEl = document.getElementById("status");
+  const card = document.getElementById("card");
+  const picks = document.querySelectorAll(".pick");
+
+  // ---------- Formatting ----------
+  // Up to 4 decimals under $1 so penny stocks don't show as $0.00
+  const money = (n) => n == null ? "—" : "$" + n.toLocaleString("en-US",
+    { minimumFractionDigits: 2, maximumFractionDigits: Math.abs(n) < 1 ? 4 : 2 });
+
+  // "Fri, Sep 25, 4:00 PM ET": market time, whatever the visitor's time zone
+  const marketTime = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  });
+  const dayOnly = new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short", month: "short", day: "numeric" });
+  function asOfText(iso) {
+    const date = iso ? new Date(iso) : null;
+    if (!date || isNaN(date)) return "Change vs. previous close";
+    // Over-the-counter stocks only get a date (midnight UTC), so don't invent a time
+    const when = iso.endsWith("T00:00:00Z") ? dayOnly.format(date) : `${marketTime.format(date)} ET`;
+    return `As of ${when} · change vs. previous close`;
+  }
+  const num = (n, digits = 2) => n == null ? "—" : n.toFixed(digits);
+
+  // Market cap, shortened: $4.98T, $972.27B, $513.75K
+  const compactMoney = new Intl.NumberFormat("en-US",
+    { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 });
+  const bigMoney = (n) => n == null ? "—" : compactMoney.format(n);
+
+  function makeBadge(type) {
+    if (type !== "ETF" && type !== "Stock") return null; // unknown: show nothing rather than guess
+    const b = document.createElement("span");
+    b.className = `badge ${type === "ETF" ? "etf" : "stock"}`;
+    b.textContent = type === "ETF" ? "ETF" : "Stock";
+    return b;
+  }
+
+  function setStatus(text, isError = false) {
+    statusEl.textContent = text;
+    statusEl.classList.toggle("error", isError);
+  }
+
+  // ---------- Quote ----------
+  let quoteSeq = 0; // only the most recent request is allowed to update the page
+
+  async function getQuote(ticker) {
+    ticker = ticker.trim();
+    closeSuggestions();
+    if (!ticker) {
+      card.hidden = true;
+      setStatus("Please enter a ticker symbol.", true);
+      return;
+    }
+
+    const seq = ++quoteSeq;
+    setBusy(true);
+    card.hidden = true;
+    setStatus("Waking up server… (the first request can take up to a minute)");
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/quote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticker }),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
+      if (seq !== quoteSeq) return;
+
+      if (!response.ok) {
+        setStatus(data.error || `Something went wrong (error ${response.status}). Please try again.`, true);
+        return;
+      }
+      if (typeof data.price !== "number") {
+        setStatus("The server sent an unexpected response. Please try again.", true);
+        return;
+      }
+
+      setStatus("");
+      renderCard(data);
+    } catch (err) {
+      if (seq !== quoteSeq) return;
+      setStatus(err.name === "TimeoutError"
+        ? "The server took too long to respond. Please try again."
+        : "Couldn't reach the server. It may be down or still starting up. Please try again in a moment.", true);
+    } finally {
+      if (seq === quoteSeq) setBusy(false);
+    }
+  }
+
+  function setBusy(busy) {
+    button.disabled = busy;
+    picks.forEach((p) => (p.disabled = busy));
+  }
+
+  function renderCard(d) {
+    const name = d.name || d.ticker;
+    document.getElementById("name").textContent = name;
+    const badge = makeBadge(d.type);
+    document.getElementById("sym").replaceChildren(d.ticker, ...(badge ? [badge] : []));
+
+    // Logo, or a letter badge if Finnhub has no logo (or it fails to load)
+    const slot = document.getElementById("logo-slot");
+    const monogram = () => {
+      const m = document.createElement("div");
+      m.className = "monogram";
+      m.textContent = name.charAt(0);
+      slot.replaceChildren(m);
+    };
+    if (d.logo) {
+      const img = document.createElement("img");
+      img.className = "logo";
+      img.alt = `${name} logo`;
+      img.src = d.logo;
+      img.onerror = monogram;
+      slot.replaceChildren(img);
+    } else {
+      monogram();
+    }
+
+    document.getElementById("price").textContent = money(d.price);
+
+    const changeEl = document.getElementById("change");
+    const dir = d.change > 0 ? "up" : d.change < 0 ? "down" : "flat";
+    const arrow = { up: "▲", down: "▼", flat: "■" }[dir];
+    const sign = { up: "+", down: "−", flat: "" }[dir];
+    changeEl.className = `change ${dir}`;
+    const pct = d.change_percent == null ? "" : ` (${sign}${num(Math.abs(d.change_percent))}%)`;
+    changeEl.textContent = d.change == null
+      ? "No change data"
+      : `${arrow} ${sign}${money(Math.abs(d.change))}${pct}`;
+    document.getElementById("as-of").textContent = asOfText(d.as_of);
+
+    const stats = [
+      ["Open", money(d.open)],
+      ["Day High", money(d.high)],
+      ["Day Low", money(d.low)],
+      ["Prev Close", money(d.previous_close)],
+      ["52W High", money(d.week_52_high)],
+      ["52W Low", money(d.week_52_low)],
+      ["P/E (TTM)", num(d.pe_ratio, 1)],
+      ["Market Cap", bigMoney(d.market_cap)],
+    ];
+    const grid = document.getElementById("stats");
+    grid.replaceChildren(...stats.map(([label, value]) => {
+      const cell = document.createElement("div");
+      cell.className = "stat";
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = value;
+      cell.append(dt, dd);
+      return cell;
+    }));
+
+    document.getElementById("notes").replaceChildren(...(d.notes || []).map((text) => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      return li;
+    }));
+
+    card.hidden = false;
+  }
+
+  // ---------- Autocomplete ----------
+  let debounceTimer;
+  let latestQuery = "";
+  let activeIndex = -1;
+  let matches = [];
+
+  input.addEventListener("input", () => {
+    clearTimeout(debounceTimer);
+    const text = input.value.trim();
+    if (!text) {
+      closeSuggestions();
+      return;
+    }
+    // Wait until the user pauses typing so we don't call the API on every keystroke
+    debounceTimer = setTimeout(() => searchCompanies(text), 300);
+  });
+
+  async function searchCompanies(text) {
+    latestQuery = text;
+    showNote("Searching…");
+    try {
+      const response = await fetch(`${BACKEND_URL}/search?q=${encodeURIComponent(text)}`,
+                                   { signal: AbortSignal.timeout(TIMEOUT_MS) });
+      const data = await response.json();
+      if (text !== latestQuery) return; // a newer search has started; ignore this one
+      if (!response.ok || !Array.isArray(data)) {
+        showNote((data && data.error) || "Suggestions unavailable right now.");
+        return;
+      }
+      showSuggestions(data);
+    } catch {
+      if (text === latestQuery) showNote("Suggestions unavailable right now.");
+    }
+  }
+
+  function showSuggestions(results) {
+    matches = results;
+    activeIndex = -1;
+    if (!results.length) {
+      showNote("No matches. Try the ticker instead, e.g. TM for Toyota.");
+      return;
+    }
+    list.replaceChildren(...results.map((r, i) => {
+      const li = document.createElement("li");
+      li.id = `opt-${i}`;
+      li.setAttribute("role", "option");
+      const sym = document.createElement("span");
+      sym.className = "sym";
+      sym.textContent = r.symbol;
+      const nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = r.name;
+      li.append(sym, nm);
+      const badge = makeBadge(r.type);
+      if (badge) li.append(badge);
+      // mousedown (not click) so it fires before the input loses focus
+      li.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        choose(i);
+      });
+      return li;
+    }));
+    openList();
+  }
+
+  function showNote(text) {
+    matches = [];
+    activeIndex = -1;
+    const li = document.createElement("li");
+    li.className = "note";
+    li.textContent = text;
+    list.replaceChildren(li);
+    openList();
+  }
+
+  function openList() {
+    list.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+    input.removeAttribute("aria-activedescendant");
+  }
+
+  function closeSuggestions() {
+    clearTimeout(debounceTimer);
+    latestQuery = "";
+    matches = [];
+    activeIndex = -1;
+    list.hidden = true;
+    input.setAttribute("aria-expanded", "false");
+    input.removeAttribute("aria-activedescendant");
+  }
+
+  function highlight(index) {
+    activeIndex = index;
+    [...list.children].forEach((li, i) => {
+      li.classList.toggle("active", i === index);
+      li.setAttribute("aria-selected", i === index ? "true" : "false");
+    });
+    input.setAttribute("aria-activedescendant", `opt-${index}`);
+  }
+
+  function choose(index) {
+    input.value = matches[index].symbol;
+    getQuote(input.value);
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (list.hidden) return;
+    if (e.key === "ArrowDown" && matches.length) {
+      e.preventDefault();
+      highlight((activeIndex + 1) % matches.length);
+    } else if (e.key === "ArrowUp" && matches.length) {
+      e.preventDefault();
+      highlight((activeIndex - 1 + matches.length) % matches.length);
+    } else if (e.key === "Enter" && activeIndex >= 0) {
+      e.preventDefault();
+      choose(activeIndex);
+    } else if (e.key === "Escape") {
+      closeSuggestions();
+    }
+  });
+
+  input.addEventListener("blur", closeSuggestions);
+
+  // ---------- Buttons ----------
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    getQuote(input.value);
+  });
+
+  picks.forEach((p) => p.addEventListener("click", () => {
+    input.value = p.textContent;
+    getQuote(p.textContent);
+  }));
+</script>
+</body>
+</html>

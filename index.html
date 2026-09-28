@@ -1512,14 +1512,50 @@ footer .credit a:hover{ color:var(--accent-soft); }
         </div>
       </article>
 
-      <!-- 04 — reserved -->
-      <article class="proj-card is-empty reveal" style="--d:.18s">
+      <!-- 04 — Stock Lookup
+           AI NOTE: I asked Claude for a simple stock lookup page on this site
+           backed by a separate Flask API on Render, and for this card to follow
+           the same format as the others. I approved the change. -->
+      <article class="proj-card reveal" style="--d:.18s">
         <div class="proj-thumb"></div>
 
         <span class="proj-num">04</span>
-        <h3 class="proj-title">Project Four</h3>
-        <p class="proj-desc">Reserved for later projects&hellip;</p>
-        <span class="proj-soon">Coming soon</span>
+        <h3 class="proj-title">Stock Lookup</h3>
+        <p class="proj-desc">
+          Type a ticker and get its current price and daily change. The page on
+          this site sends the ticker to my own Flask backend on Render, which
+          calls the Finnhub API with a key that never leaves the server.
+        </p>
+
+        <ul class="pills sm">
+          <li>Python</li>
+          <li>Flask</li>
+          <li>REST APIs</li>
+          <li>JavaScript</li>
+        </ul>
+
+        <!-- AI NOTE — LINKS. The live page is served from this repository on
+             GitHub Pages; the backend code lives in its own repository.
+             Claude wired both links in and I approved the change. -->
+        <div class="proj-links">
+          <a class="link" href="https://dcerrato-create.github.io/Personal-Website-Portfolio/stock-lookup/"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <path d="M15 3h6v6"/><path d="M10 14L21 3"/>
+            </svg>
+            Live Site
+          </a>
+          <a class="link" href="https://github.com/dcerrato-create/stock-quote-api"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/>
+            </svg>
+            Backend Repository
+          </a>
+        </div>
       </article>
 
     </div>
