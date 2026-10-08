@@ -997,6 +997,10 @@ footer .credit a:hover{ color:var(--accent-soft); }
      every reserved slot inherits the tall card's height. */
   .proj-grid{ grid-template-columns:1fr; grid-auto-rows:auto; }
   .proj-card:last-child:nth-child(odd){ grid-column:auto; width:auto; }
+  /* AI NOTE: on a phone the long Wharton pill was wider than the screen,
+     so the whole page could slide sideways. I asked Claude to fix it; the
+     pill's text now wraps onto a second line on narrow screens. */
+  .pills li.feature{ white-space:normal; max-width:100%; border-radius:20px; }
 }
 
 /* ============================================================
@@ -1005,7 +1009,10 @@ footer .credit a:hover{ color:var(--accent-soft); }
    ============================================================ */
 @media (prefers-reduced-motion:reduce){
   html{ scroll-behavior:auto; }
-  #home{ height:auto; }
+  /* overflow: the glow behind the flag is wider than a phone screen and
+     would otherwise let the page slide sideways (AI NOTE: found and fixed
+     by Claude together with the Wharton pill, at my request). */
+  #home{ height:auto; overflow:hidden; }
   .stage{ position:static; height:auto; padding:calc(var(--nav-h) + 60px) 20px 80px; }
   .stage-inner{ grid-template-areas:none; gap:52px; }
   .stage-inner > *{ grid-area:auto; }
