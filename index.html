@@ -802,6 +802,15 @@ footer .credit a:hover{ color:var(--accent-soft); }
   margin-top:clamp(28px, 4vw, 44px);
 }
 
+/* AI NOTE: with five projects the last card sat alone on the left of its
+   row. I asked Claude to keep the grid balanced without touching the other
+   cards, so a last card on its own is centred at the same width. */
+.proj-card:last-child:nth-child(odd){
+  grid-column:1 / -1;
+  justify-self:center;
+  width:calc(50% - clamp(16px, 2vw, 22px) / 2);
+}
+
 .proj-card{
   display:flex; flex-direction:column;
   padding:clamp(17px, 2vw, 22px);
@@ -987,6 +996,7 @@ footer .credit a:hover{ color:var(--accent-soft); }
   /* Single column: let each card size to its own content, otherwise
      every reserved slot inherits the tall card's height. */
   .proj-grid{ grid-template-columns:1fr; grid-auto-rows:auto; }
+  .proj-card:last-child:nth-child(odd){ grid-column:auto; width:auto; }
 }
 
 /* ============================================================
@@ -1561,6 +1571,62 @@ footer .credit a:hover{ color:var(--accent-soft); }
               <path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/>
             </svg>
             Backend Repository
+          </a>
+        </div>
+      </article>
+
+      <!-- 05 — Clásico
+           AI NOTE: I gave Claude the content for this card (title, description,
+           skills and links) and asked it to follow the same format as the
+           others. Claude took the screenshot from the live site. I approved
+           the change. -->
+      <article class="proj-card reveal" style="--d:.24s">
+        <div class="proj-thumb">
+          <img src="assets/project-clasico.jpg" loading="lazy" decoding="async"
+               alt="Clásico showing the Honduras versus El Salvador rivalry after the flag reveal: both flags, 80 matches, and the wins and draws for each side">
+        </div>
+
+        <span class="proj-num">05</span>
+        <h3 class="proj-title">Clásico</h3>
+        <p class="proj-desc">
+          A national-team rivalry explorer covering every international match
+          since 1872. Pick two teams to get an animated flag reveal, an
+          interactive match timeline, an era chart and deep statistics, plus a
+          live AI-written story of the rivalry in English or Spanish. The page
+          calls my own Flask backend on Render, which keeps the OpenAI key on
+          the server and updates itself whenever the match dataset does.
+        </p>
+
+        <ul class="pills sm">
+          <li>Python</li>
+          <li>Flask</li>
+          <li>JavaScript</li>
+          <li>OpenAI API</li>
+          <li>Data Visualization</li>
+          <li>HTML</li>
+          <li>CSS</li>
+        </ul>
+
+        <!-- AI NOTE — LINKS. The live site is served from the project's own
+             repository on GitHub Pages. I gave Claude both addresses; Claude
+             wired the links in and I approved the change. -->
+        <div class="proj-links">
+          <a class="link" href="https://dcerrato-create.github.io/clasico/"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <path d="M15 3h6v6"/><path d="M10 14L21 3"/>
+            </svg>
+            Live Site
+          </a>
+          <a class="link" href="https://github.com/dcerrato-create/clasico"
+             target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/>
+            </svg>
+            GitHub Repository
           </a>
         </div>
       </article>
