@@ -768,9 +768,8 @@ footer .credit a:hover{ color:var(--accent-soft); }
 }
 .exp-logo{
   flex:none;
+  position:relative;
   width:112px; height:112px;
-  display:grid; place-items:center;
-  padding:6px;
   background:#fff;
   border:1px solid var(--line);
   border-radius:20px;
@@ -778,10 +777,23 @@ footer .credit a:hover{ color:var(--accent-soft); }
   overflow:hidden;
   transition:transform .35s var(--ease), box-shadow .35s var(--ease);
 }
+/* The image is pinned with explicit PIXEL width/height, not a
+   percentage and not centered via grid/place-items. Two different
+   sizing bugs ruled those out: a percentage height on a grid item
+   whose own alignment isn't 'stretch' doesn't reliably get a
+   definite height to resolve against (several engines fall back to
+   deriving it from width via the image's intrinsic ratio, silently
+   over/under-sizing every logo depending on its aspect ratio); and
+   once absolutely positioned, a replaced element with 'auto'
+   width/height just keeps its natural pixel size even with all four
+   insets set, ignoring them for sizing. Hard pixel values sidestep
+   both — 98px is the 112px tile minus the 1px border and 6px
+   padding on each side (74px tile: 64px, minus 1px border/5px pad). */
+.exp-logo img{ position:absolute; inset:6px; width:98px; height:98px; object-fit:contain; }
 /* ImaageQ's mark is white-on-black — that black IS its background, so it
    gets no white mat and sits flush, unlike the white-background logos. */
-.exp-logo.is-flush{ padding:0; background:#000; }
-.exp-logo img{ width:100%; height:100%; object-fit:contain; }
+.exp-logo.is-flush{ background:#000; }
+.exp-logo.is-flush img{ inset:0; width:110px; height:110px; }
 .exp:hover .exp-logo{
   transform:translateY(-3px);
   box-shadow:0 10px 22px -8px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.4) inset;
@@ -1011,7 +1023,9 @@ footer .credit a:hover{ color:var(--accent-soft); }
     align-items:center; gap:10px;
   }
   .exp-kind{ margin-top:0; }
-  .exp-logo{ width:76px; height:76px; padding:5px; border-radius:16px; }
+  .exp-logo{ width:76px; height:76px; border-radius:16px; }
+  .exp-logo img{ inset:5px; width:64px; height:64px; }
+  .exp-logo.is-flush img{ inset:0; width:74px; height:74px; }
   .exp-head{ gap:16px; }
 }
 
