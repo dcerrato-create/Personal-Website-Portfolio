@@ -756,11 +756,36 @@ footer .credit a:hover{ color:var(--accent-soft); }
 }
 
 /* ---- Right column: role & detail ---- */
+/* Logo sits in its own white tile — the source marks vary wildly
+   (transparent, black background, white background), so a uniform
+   light chip is what makes them read as one consistent row instead
+   of four mismatched stickers. */
+.exp-head{
+  display:flex; align-items:center; gap:15px;
+  margin-bottom:17px;
+}
+.exp-logo{
+  flex:none;
+  width:50px; height:50px;
+  display:grid; place-items:center;
+  padding:8px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:0 1px 0 rgba(255,255,255,.4) inset;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.exp-logo img{ width:100%; height:100%; object-fit:contain; }
+.exp:hover .exp-logo{
+  transform:translateY(-3px);
+  box-shadow:0 10px 22px -8px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.4) inset;
+}
+.exp-head-text{ min-width:0; }
+
 .exp-role{
   font-size:clamp(1.12rem, 2vw, 1.4rem);
   font-weight:650; letter-spacing:-.02em;
   line-height:1.3;
-  margin-bottom:5px;
   transition:color .3s var(--ease);
 }
 .exp:hover .exp-role{ color:var(--accent-soft); }
@@ -768,8 +793,9 @@ footer .credit a:hover{ color:var(--accent-soft); }
 .exp-org{
   font-size:.95rem; font-weight:500;
   color:var(--muted);
-  margin-bottom:17px;
 }
+
+.exp-points strong{ color:var(--text); font-weight:650; }
 
 .exp-points{ list-style:none; display:flex; flex-direction:column; gap:9px; }
 .exp-points li{
@@ -1291,12 +1317,20 @@ footer .credit a:hover{ color:var(--accent-soft); }
           <span class="exp-kind">Extracurricular</span>
         </div>
         <div class="exp-what">
-          <h3 class="exp-role">Mentee</h3>
-          <p class="exp-org">Research &amp; Asset Management Academy</p>
+          <div class="exp-head">
+            <div class="exp-logo">
+              <img src="assets/exp-logo-rama.png" loading="lazy" decoding="async"
+                   alt="Research &amp; Asset Management Academy logo">
+            </div>
+            <div class="exp-head-text">
+              <h3 class="exp-role">Mentee</h3>
+              <p class="exp-org">Research &amp; Asset Management Academy</p>
+            </div>
+          </div>
           <ul class="exp-points">
-            <li>Selected from a pool of 30+ applicants through a technical and behavioral interview process.</li>
-            <li>Weekly curriculum across private equity, hedge funds, and credit research, paired with one-on-one mentorship to build the analytical framework for buy-side and sell-side roles.</li>
-            <li>Hands-on training in three-statement financial modeling, LBO modeling, accounting, DCF valuation, and stock pitching.</li>
+            <li>Selected from a pool of <strong>30+ applicants</strong> through a technical and behavioral interview process.</li>
+            <li>Weekly curriculum across <strong>private equity, hedge funds, and credit research</strong>, paired with one-on-one mentorship to build the analytical framework for buy-side and sell-side roles.</li>
+            <li>Hands-on training in three-statement financial modeling, <strong>LBO modeling</strong>, accounting, DCF valuation, and stock pitching.</li>
           </ul>
         </div>
       </li>
@@ -1308,13 +1342,21 @@ footer .credit a:hover{ color:var(--accent-soft); }
           <span class="exp-kind">Internship</span>
         </div>
         <div class="exp-what">
-          <h3 class="exp-role">Financial Analyst</h3>
-          <p class="exp-org">ImaageQ Corporation</p>
+          <div class="exp-head">
+            <div class="exp-logo">
+              <img src="assets/exp-logo-imaageq.png" loading="lazy" decoding="async"
+                   alt="ImaageQ Corporation logo">
+            </div>
+            <div class="exp-head-text">
+              <h3 class="exp-role">Financial Analyst</h3>
+              <p class="exp-org">ImaageQ Corporation</p>
+            </div>
+          </div>
           <ul class="exp-points">
-            <li>Analyzed financial models and investor relations strategy for a $5M seed round at a $20M post-money valuation; built valuation frameworks and pitch materials, and supported investor meetings that secured $1M in committed capital.</li>
-            <li>Developed competitive analysis and market positioning across 8 competitors in the spatial intelligence and AR real estate commerce space, presenting key differentiators directly to investors.</li>
-            <li>Built a 2026–2029 scenario analysis modeling revenue, net income, NRR, and burn rate across key operating assumptions.</li>
-            <li>Assessed exit strategy across potential acquirers and market comps, recommending an acquisition over an IPO.</li>
+            <li>Analyzed financial models and investor relations strategy for a $5M seed round at a $20M post-money valuation; built valuation frameworks and pitch materials, and supported investor meetings that secured <strong>$1M in committed capital</strong>.</li>
+            <li>Developed competitive analysis and market positioning across <strong>8 competitors</strong> in the spatial intelligence and AR real estate commerce space, presenting key differentiators directly to investors.</li>
+            <li>Built a 2026–2029 scenario analysis modeling <strong>revenue, net income, NRR, and burn rate</strong> across key operating assumptions.</li>
+            <li>Assessed exit strategy across potential acquirers and market comps, recommending an <strong>acquisition over an IPO</strong>.</li>
           </ul>
         </div>
       </li>
@@ -1326,12 +1368,20 @@ footer .credit a:hover{ color:var(--accent-soft); }
           <span class="exp-kind">Internship</span>
         </div>
         <div class="exp-what">
-          <h3 class="exp-role">Business Operations Intern</h3>
-          <p class="exp-org">Grupo Agrolíbano</p>
+          <div class="exp-head">
+            <div class="exp-logo">
+              <img src="assets/exp-logo-agrolibano.png" loading="lazy" decoding="async"
+                   alt="Grupo Agrolíbano logo">
+            </div>
+            <div class="exp-head-text">
+              <h3 class="exp-role">Business Operations Intern</h3>
+              <p class="exp-org">Grupo Agrolíbano</p>
+            </div>
+          </div>
           <ul class="exp-points">
-            <li>Gained hands-on understanding of supply chain operations and logistics across a diversified agricultural conglomerate, including how geographic constraints and country-level risk shape operational strategy in Honduras's export markets.</li>
-            <li>Participated in meetings with shipping companies including Hapag-Lloyd and Seaboard Marine to discuss freight logistics and contract negotiations.</li>
-            <li>Learned the melon-cultivation cycle end-to-end, from field operations to the administrative functions that support them.</li>
+            <li>Gained hands-on understanding of <strong>supply chain operations and logistics</strong> across a diversified agricultural conglomerate, including how geographic constraints and country-level risk shape operational strategy in Honduras's export markets.</li>
+            <li>Participated in meetings with shipping companies including <strong>Hapag-Lloyd and Seaboard Marine</strong> to discuss freight logistics and contract negotiations.</li>
+            <li>Learned the <strong>melon-cultivation cycle</strong> end-to-end, from field operations to the administrative functions that support them.</li>
           </ul>
         </div>
       </li>
@@ -1343,11 +1393,19 @@ footer .credit a:hover{ color:var(--accent-soft); }
           <span class="exp-kind">Internship</span>
         </div>
         <div class="exp-what">
-          <h3 class="exp-role">Wealth Management Intern</h3>
-          <p class="exp-org">Andbank</p>
+          <div class="exp-head">
+            <div class="exp-logo">
+              <img src="assets/exp-logo-andbank.png" loading="lazy" decoding="async"
+                   alt="Andbank logo">
+            </div>
+            <div class="exp-head-text">
+              <h3 class="exp-role">Wealth Management Intern</h3>
+              <p class="exp-org">Andbank</p>
+            </div>
+          </div>
           <ul class="exp-points">
-            <li>Conducted research on equities, fixed income, and mutual funds for a $60B+ AUM wealth management bank, analyzing earnings reports of 20+ portfolio companies to identify opportunities for clients.</li>
-            <li>Executed and processed over $1M in client transactions while reviewing portfolios, gaining hands-on exposure to asset allocation and risk-reward dynamics across asset types.</li>
+            <li>Conducted research on equities, fixed income, and mutual funds for a <strong>$60B+ AUM</strong> wealth management bank, analyzing earnings reports of 20+ portfolio companies to identify opportunities for clients.</li>
+            <li>Executed and processed <strong>over $1M in client transactions</strong> while reviewing portfolios, gaining hands-on exposure to asset allocation and risk-reward dynamics across asset types.</li>
             <li>Prepared daily market briefs for clients and internal teams, synthesizing market movements into actionable insights.</li>
           </ul>
         </div>
