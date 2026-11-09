@@ -773,8 +773,12 @@ footer .credit a:hover{ color:var(--accent-soft); }
   border:1px solid var(--line);
   border-radius:20px;
   box-shadow:0 1px 0 rgba(255,255,255,.4) inset;
+  overflow:hidden;
   transition:transform .35s var(--ease), box-shadow .35s var(--ease);
 }
+/* ImaageQ's mark is white-on-black — that black IS its background, so it
+   gets no white mat and sits flush, unlike the white-background logos. */
+.exp-logo.is-flush{ padding:0; background:#000; }
 .exp-logo img{ width:100%; height:100%; object-fit:contain; }
 .exp:hover .exp-logo{
   transform:translateY(-3px);
@@ -1345,7 +1349,7 @@ footer .credit a:hover{ color:var(--accent-soft); }
         </div>
         <div class="exp-what">
           <div class="exp-head">
-            <div class="exp-logo">
+            <div class="exp-logo is-flush">
               <img src="assets/exp-logo-imaageq.png" loading="lazy" decoding="async"
                    alt="ImaageQ Corporation logo">
             </div>
