@@ -759,27 +759,41 @@ footer .credit a:hover{ color:var(--accent-soft); }
 /* Logo sits in its own white tile — the source marks vary wildly
    (transparent, black background, white background), so a uniform
    light chip is what makes them read as one consistent row instead
-   of four mismatched stickers. */
+   of four mismatched stickers.
+
+   The tile is NOT forced square. Every source mark is a wide
+   wordmark, not an icon — a fixed square box caps a wide image by
+   its width, so most of the box sits empty above and below it no
+   matter how tightly the source is cropped. Instead the box hugs
+   the image: the image is capped by max-height/max-width (so no
+   single logo dominates the row) with the other axis left free, and
+   the tile sizes itself to that plus a fixed mat. The math is the
+   same as object-fit:contain, just driving the box instead of
+   filling a fixed one — so a tall mark (Agrolíbano) comes out
+   narrow-but-tall, a flat wordmark (Andbank) comes out wide-but-
+   short, and both fill their own tile completely either way. */
 .exp-head{
-  display:flex; align-items:center; gap:24px;
+  display:flex; align-items:center; gap:22px;
   margin-bottom:20px;
 }
 .exp-logo{
   flex:none;
-  width:112px; height:112px;
-  display:grid; place-items:center;
-  padding:6px;
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:14px;
   background:#fff;
   border:1px solid var(--line);
-  border-radius:20px;
+  border-radius:18px;
   box-shadow:0 1px 0 rgba(255,255,255,.4) inset;
-  overflow:hidden;
   transition:transform .35s var(--ease), box-shadow .35s var(--ease);
 }
 /* ImaageQ's mark is white-on-black — that black IS its background, so it
    gets no white mat and sits flush, unlike the white-background logos. */
 .exp-logo.is-flush{ padding:0; background:#000; }
-.exp-logo img{ width:100%; height:100%; object-fit:contain; }
+.exp-logo img{
+  display:block;
+  width:auto; height:auto;
+  max-height:100px; max-width:230px;
+}
 .exp:hover .exp-logo{
   transform:translateY(-3px);
   box-shadow:0 10px 22px -8px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.4) inset;
@@ -1009,7 +1023,8 @@ footer .credit a:hover{ color:var(--accent-soft); }
     align-items:center; gap:10px;
   }
   .exp-kind{ margin-top:0; }
-  .exp-logo{ width:76px; height:76px; padding:5px; border-radius:16px; }
+  .exp-logo{ padding:9px; border-radius:14px; }
+  .exp-logo img{ max-height:64px; max-width:150px; }
   .exp-head{ gap:16px; }
 }
 
